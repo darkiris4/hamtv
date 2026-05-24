@@ -5,6 +5,13 @@
 let globalHeroItems = [];     // from /api/hero
 const providerCache = {};     // { tmdb_provider_id → items[] }, populated in background
 
+// Auto-scroll state
+let autoScrollItems  = [];
+let autoScrollIndex  = 0;
+let autoScrollData   = null;
+let autoScrollAccent = null;
+let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 (async function init() {
@@ -37,8 +44,8 @@ const providerCache = {};     // { tmdb_provider_id → items[] }, populated in 
   for (const tile of tiles) grid.appendChild(buildTile(tile));
   grid.appendChild(buildSettingsTile());
 
-  // Initial hero — TMDB global content if available, else tile metadata fallback
-  focusTile(tiles[0], false);
+  // Initial state — show project logo (no service hovered yet)
+  focusGlobal(false);
 
   // Background-prefetch per-provider content so hovers are instant
   for (const tile of tiles) {
@@ -179,70 +186,116 @@ const bgGlow       = document.getElementById('bg-glow');
 
 let heroTimer;
 
+// ── Auto-scroll helpers ───────────────────────────────────────────────────────
+
+function stopHeroAutoScroll() {
+  clearTimeout(heroAutoTimer);
+  heroAutoTimer = null;
+}
+
+// Schedule the next TMDB item advance (5-10s random interval).
+// Reschedules itself until stopHeroAutoScroll() is called.
+function scheduleHeroScroll() {
+  stopHeroAutoScroll();
+  if (autoScrollItems.length < 2) return;
+
+  const delay = 5000 + Math.random() * 5000;
+  heroAutoTimer = setTimeout(() => {
+    autoScrollIndex = (autoScrollIndex + 1) % autoScrollItems.length;
+    heroCard.style.opacity   = '0';
+    heroCard.style.transform = 'translateY(10px)';
+    clearTimeout(heroTimer);
+    heroTimer = setTimeout(() => {
+      applyHeroContent(autoScrollData, autoScrollAccent, autoScrollItems[autoScrollIndex]);
+      heroCard.style.opacity   = '1';
+      heroCard.style.transform = 'translateY(0)';
+      scheduleHeroScroll();
+    }, 140);
+  }, delay);
+}
+
 // ── Hero focus — tile ─────────────────────────────────────────────────────────
 
 function focusTile(data, animate) {
   const accent = data.color || 'rgba(255,255,255,0.5)';
   bgGlow.style.backgroundColor = accent;
+  stopHeroAutoScroll();
 
-  if (!animate) { applyHeroContent(data, accent); return; }
+  // Seed auto-scroll state for this service
+  autoScrollData   = data;
+  autoScrollAccent = accent;
+  autoScrollItems  = (heroItemsFor(data) || []).filter(i => i?.backdrop);
+  autoScrollIndex  = autoScrollItems.length
+    ? Math.floor(Math.random() * autoScrollItems.length)
+    : 0;
+  const item = autoScrollItems[autoScrollIndex] || null;
+
+  if (!animate) {
+    applyHeroContent(data, accent, item);
+    scheduleHeroScroll();
+    return;
+  }
 
   heroCard.style.opacity   = '0';
   heroCard.style.transform = 'translateY(10px)';
   clearTimeout(heroTimer);
   heroTimer = setTimeout(() => {
-    applyHeroContent(data, accent);
+    applyHeroContent(data, accent, item);
     heroCard.style.opacity   = '1';
     heroCard.style.transform = 'translateY(0)';
+    scheduleHeroScroll();
   }, 140);
 }
 
-// ── Hero focus — global trending (on mouse-out) ───────────────────────────────
+// ── Hero focus — idle (no service hovered) ────────────────────────────────────
 
 function focusGlobal(animate) {
-  if (!globalHeroItems.length) return;   // nothing to show; leave hero as-is
-
+  stopHeroAutoScroll();
   bgGlow.style.backgroundColor = '#1c1c1e';
   clearTimeout(heroTimer);
 
-  if (!animate) { applyGlobalHero(); return; }
+  if (!animate) { applyIdleHero(); return; }
 
   heroCard.style.opacity   = '0';
   heroCard.style.transform = 'translateY(10px)';
   heroTimer = setTimeout(() => {
-    applyGlobalHero();
+    applyIdleHero();
     heroCard.style.opacity   = '1';
     heroCard.style.transform = 'translateY(0)';
   }, 140);
 }
 
-function applyGlobalHero() {
-  const item = pickRandom(globalHeroItems);
-  if (!item) return;
-
-  // No specific service to navigate to in global trending state
+function applyIdleHero() {
   heroCard.removeAttribute('href');
   heroCard.style.cursor = 'default';
 
-  heroName.textContent    = item.title;
-  heroTagline.textContent = item.tagline;
-  heroTagline.hidden      = !item.tagline;
-  heroDomain.textContent  = 'Trending Today';
+  heroName.textContent    = 'Ham TV';
+  heroTagline.textContent = '';
+  heroTagline.hidden      = true;
+  heroDomain.textContent  = '';
 
-  setHeroBackdrop(item.backdrop);
-  heroLogo.style.display    = 'none';
-  heroInitial.style.display = 'none';
+  setHeroBackdrop('/hamtv.png');
+
+  heroLogo.alt     = 'Ham TV';
+  heroLogo.onload  = () => { heroLogo.style.display = 'block'; heroInitial.style.display = 'none'; };
+  heroLogo.onerror = () => { heroLogo.style.display = 'none';  heroInitial.style.display = 'none'; };
+  if (heroLogo.src !== new URL('/hamtv.png', location.href).href) heroLogo.src = '/hamtv.png';
+  if (heroLogo.complete && heroLogo.naturalWidth > 0) {
+    heroLogo.style.display    = 'block';
+    heroInitial.style.display = 'none';
+  }
 }
 
 // ── Hero content — tile-specific ──────────────────────────────────────────────
 
-function applyHeroContent(data, accent) {
+// item is pre-selected by the caller (auto-scroll) or null to pick randomly.
+function applyHeroContent(data, accent, item = null) {
   heroCard.href         = data.url;
   heroCard.style.cursor = '';
   heroCard.target       = data.newTab ? '_blank' : '';
   heroCard.rel          = data.newTab ? 'noopener noreferrer' : '';
 
-  const item = pickRandom(heroItemsFor(data));
+  if (item === null) item = pickRandom(heroItemsFor(data));
 
   if (item) {
     // Content mode: TMDB backdrop + title/tagline, service logo as badge
