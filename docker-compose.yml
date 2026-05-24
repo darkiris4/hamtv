@@ -9,5 +9,4 @@ services:
       - ./config.json:/app/config.json
     environment:
       PORT: "${PORT:-3000}"
-      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}"
     restart: unless-stopped
