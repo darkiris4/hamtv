@@ -54,15 +54,19 @@ const providerCache = {};     // { tmdb_provider_id → items[] }, populated in 
 // ── TMDB hero item helpers ────────────────────────────────────────────────────
 
 // Provider → global → [] (always silent, never throws)
+// Tiles with no tmdb_provider_id skip TMDB entirely and return [] so the
+// caller falls back to static branding; global trending is only used when a
+// provider-specific fetch failed.
 function heroItemsFor(tile) {
   if (tile?.tmdb_provider_id != null) {
     return providerCache[tile.tmdb_provider_id] ?? globalHeroItems;
   }
-  return globalHeroItems;
+  return [];
 }
 
 function pickRandom(arr) {
-  return arr?.length ? arr[Math.floor(Math.random() * arr.length)] : null;
+  const valid = (arr || []).filter(item => item?.backdrop);
+  return valid.length ? valid[Math.floor(Math.random() * valid.length)] : null;
 }
 
 // ── Service tile ──────────────────────────────────────────────────────────────
