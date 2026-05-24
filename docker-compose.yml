@@ -1,6 +1,6 @@
 services:
   streaming-launcher:
-    build: .
+    image: ghcr.io/darkiris4/hamtv:latest
     ports:
       - "${PORT:-3000}:3000"
     volumes:
