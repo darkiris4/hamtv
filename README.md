@@ -1,119 +1,125 @@
-# Streaming Launcher
+# hamtv
 
-A self-hosted, Apple TV-style launcher for your streaming services. Single-page web app served by a tiny Node/Express server — no build step, no framework.
-
-![Dark tile grid with service logos and glowing hover effects](https://placeholder)
+A self-hosted, Apple TV-style launcher for your streaming services. Single-page web app with a TMDB-powered hero backdrop, served by a tiny Node/Express server — no build step, no framework.
 
 ---
 
 ## Quick Start
 
+### Docker (recommended)
+
+Create `config.json` in your deploy directory first, then pull and run:
+
+```bash
+echo '[]' > config.json
+docker compose up -d
+```
+
+Open **http://localhost:3000**. Tiles are configured via the admin panel at **/admin**.
+
+> **Note:** `config.json` must exist as a file before `docker compose up` — if Docker creates it as a directory you'll get an `EISDIR` error. Run `echo '[]' > config.json` to fix it.
+
 ### Bare Node.js
 
 ```bash
-git clone <repo>
-cd streaming-launcher
+git clone https://github.com/darkiris4/hamtv
+cd hamtv
+cp .env.example .env   # add your TMDB_API_KEY
 npm install
 node server.js
 ```
 
-Open **http://localhost:3000** in your browser.
-
-### Docker
-
-```bash
-docker-compose up -d
-```
-
-Open **http://localhost:3000**. The `config.json` is volume-mounted, so tile changes survive container rebuilds.
-
 ---
 
-## Configuration
+## Environment Variables
 
-### Environment variables
-
-| Variable         | Default   | Description                              |
-|------------------|-----------|------------------------------------------|
-| `PORT`           | `3000`    | Port the server listens on               |
-| `ADMIN_PASSWORD` | `admin`   | Password for the `/admin` panel          |
-
-Copy `.env.example` to `.env` and set your values:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-### `config.json` schema
+| Variable        | Default | Description                              |
+|-----------------|---------|------------------------------------------|
+| `PORT`          | `3000`  | Port the server listens on               |
+| `TMDB_API_KEY`  | —       | TMDB v3 API key or v4 JWT read token. Enables the hero backdrop feature. Get one free at themoviedb.org |
 
-The tile grid is driven entirely by `config.json` at the project root. It's a JSON array of tile objects:
+---
+
+## TMDB Hero
+
+When `TMDB_API_KEY` is set, the hero section at the top of the launcher shows a full-bleed backdrop image from the focused service's content catalogue. On focus, it fetches popular titles available on that provider; if a provider has no TMDB ID configured, the hero falls back to the tile's static branding instead.
+
+To wire a tile to a TMDB provider, set `tmdb_provider_id` in `config.json` (e.g. Netflix = `8`, Disney+ = `337`, Hulu = `15`).
+
+---
+
+## Configuration
+
+Tiles are defined in `config.json` — a JSON array. Edit it directly or use the admin panel.
 
 ```json
 [
   {
-    "name":   "Netflix",
-    "url":    "https://www.netflix.com",
-    "logo":   "https://www.google.com/s2/favicons?domain=netflix.com&sz=128",
-    "color":  "#E50914",
-    "newTab": false
+    "name":             "Netflix",
+    "url":              "https://www.netflix.com",
+    "logo":             "/icons/netflix.png",
+    "color":            "#E50914",
+    "newTab":           false,
+    "tmdb_provider_id": 8
   }
 ]
 ```
 
-| Field    | Required | Description                                                        |
-|----------|----------|--------------------------------------------------------------------|
-| `name`   | Yes      | Display label shown below the logo                                 |
-| `url`    | Yes      | URL opened when the tile is clicked                                |
-| `logo`   | No       | Image URL (local path or external). Falls back to a text initial.  |
-| `color`  | No       | Hex accent color used for the tile glow on hover (`#RRGGBB`)       |
-| `newTab` | No       | `true` to open in a new tab; `false` (default) for same tab        |
-
-You can edit `config.json` directly, or use the admin panel.
+| Field               | Required | Description                                                        |
+|---------------------|----------|--------------------------------------------------------------------|
+| `name`              | Yes      | Display label                                                      |
+| `url`               | Yes      | URL opened when the tile is clicked                                |
+| `logo`              | No       | Image URL or local path. Falls back to a text initial.             |
+| `color`             | No       | Hex accent color for the tile glow (`#RRGGBB`)                     |
+| `newTab`            | No       | `true` to open in a new tab                                        |
+| `tmdb_provider_id`  | No       | TMDB watch provider ID — enables provider-specific hero backdrops  |
 
 ---
 
 ## Admin Panel
 
-Navigate to **http://localhost:3000/admin** and sign in with your `ADMIN_PASSWORD`.
+Navigate to **http://localhost:3000/admin**.
 
-From the editor you can:
-- **Add** new tiles
-- **Edit** name, URL, logo URL, accent color, and new-tab behavior
-- **Delete** tiles (with confirmation)
-- **Reorder** tiles with the ↑ / ↓ buttons
-- **Save** — writes changes back to `config.json` on disk immediately
-
-The launcher grid reloads from the server on every page load, so saved changes are live instantly.
+- Add, edit, delete, and reorder tiles
+- Changes are written to `config.json` immediately and reflected on next page load
 
 ---
 
-## Deployment Tips
+## Docker Image
 
-### Reverse proxy (HTTPS)
-
-Put a reverse proxy in front for HTTPS and optional basic auth. Example Caddy config:
+Pre-built image is published to GHCR on every push to `main`:
 
 ```
-streaming.example.com {
+ghcr.io/darkiris4/hamtv:latest
+```
+
+The `config.json` is bind-mounted at runtime so tile changes survive image updates.
+
+---
+
+## Reverse Proxy
+
+Example Caddy config for HTTPS:
+
+```
+tv.example.com {
     reverse_proxy localhost:3000
 }
 ```
-
-### Keeping config across rebuilds (Docker)
-
-The `docker-compose.yml` mounts `./config.json` into the container. As long as `config.json` exists in the project directory on the host, your tiles survive any `docker-compose up --build`.
-
-### Running on a home server / Raspberry Pi
-
-The app requires only Node 18+ and has two production dependencies (`express`, `dotenv`). Memory footprint is minimal — suitable for low-power hardware.
 
 ---
 
 ## Project Structure
 
 ```
-streaming-launcher/
-├── server.js          # Express server (API + static file serving)
+hamtv/
+├── server.js          # Express server — API + static file serving + TMDB cache
 ├── config.json        # Tile definitions (edit directly or via /admin)
 ├── package.json
 ├── .env.example
@@ -121,21 +127,21 @@ streaming-launcher/
 ├── docker-compose.yml
 └── public/
     ├── index.html     # Launcher page
-    ├── style.css      # Dark Apple TV-style theme
-    ├── app.js         # Fetches config, renders tile grid
-    ├── admin.html     # Admin editor page
+    ├── style.css
+    ├── app.js         # Config fetch, tile grid, TMDB hero logic
+    ├── admin.html
     ├── admin.css
-    └── admin.js       # Auth, tile CRUD, save
+    └── admin.js
 ```
 
 ---
 
 ## API
 
-| Method | Path                  | Auth     | Description                           |
-|--------|-----------------------|----------|---------------------------------------|
-| GET    | `/api/config`         | —        | Returns the current tile array as JSON |
-| POST   | `/api/admin/verify`   | password | Verifies the admin password            |
-| POST   | `/api/config`         | password | Overwrites `config.json` with new tiles |
-
-Password is sent in the JSON request body as `{ "password": "..." }`.
+| Method | Path                | Description                            |
+|--------|---------------------|----------------------------------------|
+| GET    | `/api/config`       | Returns current tile array             |
+| POST   | `/api/config`       | Overwrites tiles (admin auth required) |
+| GET    | `/api/hero`         | Global TMDB trending items             |
+| GET    | `/api/hero/:id`     | Provider-specific items, falls back to global |
+| POST   | `/api/admin/verify` | Verifies admin password                |
