@@ -45,22 +45,23 @@ body {
 
 #hero {
   position: relative;
-  height: clamp(270px, 38vh, 380px);
+  height: 58vh;
+  min-height: 480px;
+  max-height: 760px;
+
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  z-index: 1;
 }
 
-/* Blurred service logo used as a painterly backdrop */
+/* TMDB movie/TV backdrop — shown crisp, darkened slightly for legibility */
 #hero-backdrop {
   position: absolute;
-  /* Oversized so blur doesn't leave transparent edges */
-  inset: -40px;
-  background-size: contain;
+  inset: 0;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  filter: blur(90px) saturate(1.8) brightness(0.45);
+  filter: brightness(0.65);
   opacity: 0;
   /* Backdrop image crossfades in after content is set */
   transition: background-image 0s, opacity 0.5s ease;
