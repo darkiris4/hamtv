@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Streaming Launcher</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ── Editor ───────────────────────────────────────────────────────── -->
+  <div id="editor">
+
+    <header class="editor-header">
+      <h1>Tile Editor</h1>
+      <div class="header-actions">
+        <span id="save-status" class="save-status" aria-live="polite"></span>
+        <button id="add-btn"  class="btn-secondary">+ Add tile</button>
+        <button id="save-btn" class="btn-primary">Save</button>
+        <a href="/" class="btn-ghost">← Launcher</a>
+      </div>
+    </header>
+
+    <div id="tile-list" class="tile-list">
+      <!-- Tile rows injected by admin.js -->
+    </div>
+
+    <div id="empty-state" class="empty-state" hidden>
+      No tiles yet. Click <strong>+ Add tile</strong> to get started.
+    </div>
+
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

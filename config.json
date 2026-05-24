@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Apple TV",
+    "url": "https://tv.apple.com",
+    "logo": "/icons/appletv.png",
+    "color": "#1C1C1E",
+    "newTab": false,
+    "tmdb_provider_id": 350
+  },
+  {
+    "name": "Jellyfin",
+    "url": "https://roadtrip.hamlan.io",
+    "logo": "/icons/jellyfin.png",
+    "color": "#00A4DC",
+    "newTab": false,
+    "tmdb_provider_id": null
+  },
+  {
+    "name": "Hulu",
+    "url": "https://www.hulu.com",
+    "logo": "/icons/hulu.jpg",
+    "color": "#1CE783",
+    "newTab": false,
+    "tmdb_provider_id": 15
+  },
+  {
+    "name": "Disney+",
+    "url": "https://www.disneyplus.com",
+    "logo": "/icons/disneyplus.jpg",
+    "color": "#0063E5",
+    "newTab": false,
+    "tmdb_provider_id": 337
+  },
+  {
+    "name": "Peacock",
+    "url": "https://www.peacocktv.com",
+    "logo": "/icons/peacock.jpg",
+    "color": "#F5A623",
+    "newTab": false,
+    "tmdb_provider_id": 386
+  },
+  {
+    "name": "Paramount+",
+    "url": "https://www.paramountplus.com",
+    "logo": "/icons/paramount.jpg",
+    "color": "#0064FF",
+    "newTab": false,
+    "tmdb_provider_id": 531
+  },
+  {
+    "name": "Prime Video",
+    "url": "https://www.primevideo.com",
+    "logo": "/icons/prime.jpg",
+    "color": "#00A8E1",
+    "newTab": false,
+    "tmdb_provider_id": 9
+  },
+  {
+    "name": "YouTube",
+    "url": "https://www.youtube.com",
+    "logo": "/icons/youtube.jpg",
+    "color": "#FF0000",
+    "newTab": false,
+    "tmdb_provider_id": 192
+  },
+  {
+    "name": "Apple Fitness+",
+    "url": "https://fitness.apple.com",
+    "logo": "/icons/fitness.png",
+    "color": "#FF2D55",
+    "newTab": false,
+    "tmdb_provider_id": null
+  },
+  {
+    "name": "Apple Music",
+    "url": "https://music.apple.com/us/new",
+    "logo": "/icons/applemusic.png",
+    "color": "#FC3C44",
+    "newTab": false,
+    "tmdb_provider_id": null
+  }
+]

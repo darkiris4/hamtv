@@ -1,0 +1,277 @@
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #111;
+  color: #ccc;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+               system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── Editor shell ──────────────────────────────────────────────────────────── */
+
+#editor {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 100px;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.editor-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Tile rows ─────────────────────────────────────────────────────────────── */
+
+.tile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tile-row {
+  display: grid;
+  /* drag handle | fields | actions */
+  grid-template-columns: 28px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  background: #1c1c1c;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: border-color 0.15s;
+}
+
+.tile-row:hover {
+  border-color: #3a3a3a;
+}
+
+.tile-handle {
+  color: #444;
+  font-size: 18px;
+  text-align: center;
+  padding-top: 28px; /* vertically align with first field label */
+  cursor: default;
+  user-select: none;
+}
+
+/* ── Field grid inside each row ────────────────────────────────────────────── */
+
+.tile-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 90px 72px;
+  gap: 10px 12px;
+  align-items: end;
+}
+
+.tile-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
+}
+
+/* New-tab checkbox spans the full width of the fields grid */
+.field-newtab {
+  grid-column: 1 / -1;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: #666 !important;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+/* ── Action buttons column ─────────────────────────────────────────────────── */
+
+.tile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  padding-top: 20px; /* align with first input */
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────────── */
+
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  background: #0e0e0e;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  color: #ddd;
+  font-size: 13px;
+  padding: 7px 10px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus {
+  border-color: #484848;
+}
+
+input[type="color"] {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  background: #0e0e0e;
+  padding: 3px 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #4a9eff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+
+.btn-primary {
+  background: #4a9eff;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: #3a8ef0; }
+.btn-primary:disabled { opacity: 0.5; cursor: default; }
+
+.btn-secondary {
+  background: #252525;
+  color: #bbb;
+  border: 1px solid #333;
+  border-radius: 7px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-secondary:hover { background: #2e2e2e; color: #ddd; }
+.btn-secondary:disabled { opacity: 0.4; cursor: default; }
+
+.btn-ghost {
+  background: transparent;
+  color: #666;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  text-decoration: none;
+  border-radius: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.btn-ghost:hover { color: #aaa; }
+
+.btn-danger {
+  background: transparent;
+  color: #c05050;
+  border: 1px solid #3a1f1f;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-danger:hover { background: #251515; }
+
+.btn-icon {
+  background: #252525;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-icon:hover:not(:disabled) { background: #2e2e2e; color: #ccc; }
+.btn-icon:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Status / error ────────────────────────────────────────────────────────── */
+
+.error {
+  color: #c05050;
+  font-size: 13px;
+  min-height: 18px;
+}
+
+.save-status {
+  font-size: 13px;
+  color: #4a4;
+  transition: opacity 0.3s;
+}
+
+.save-status.is-error { color: #c05050; }
+
+/* ── Empty state ───────────────────────────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  color: #444;
+  padding: 60px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ── Responsive: stack field columns on small screens ─────────────────────── */
+
+@media (max-width: 720px) {
+  .tile-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tile-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tile-handle { display: none; }
+  .tile-actions { flex-direction: row; padding-top: 0; }
+}

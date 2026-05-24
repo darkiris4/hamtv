@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming Launcher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Full-viewport ambient color blob that shifts with each focused service -->
+  <div id="bg-glow" aria-hidden="true"></div>
+
+  <!-- Hero: always-visible top shelf showing the focused service -->
+  <header id="hero">
+    <!-- Blurred backdrop driven by the focused service's logo -->
+    <div id="hero-backdrop" aria-hidden="true"></div>
+    <!-- Vignette overlay to keep text readable -->
+    <div id="hero-vignette" aria-hidden="true"></div>
+
+    <div id="hero-body">
+
+      <!-- App identity bar -->
+      <div id="top-bar">
+        <span class="app-brand">Streaming Launcher</span>
+      </div>
+
+      <!-- Focused-service card (becomes an anchor link to that service) -->
+      <a id="hero-card" href="#" tabindex="-1">
+        <div id="hero-logo-wrap">
+          <img id="hero-logo" src="" alt="" draggable="false">
+          <div id="hero-initial" aria-hidden="true"></div>
+        </div>
+        <div id="hero-meta">
+          <h1 id="hero-name"></h1>
+          <p  id="hero-tagline"></p>
+          <p  id="hero-domain"></p>
+        </div>
+      </a>
+
+    </div>
+  </header>
+
+  <!-- Tile grid -->
+  <main id="grid" class="tile-grid"></main>
+
+  <script src="app.js"></script>
+</body>
+</html>

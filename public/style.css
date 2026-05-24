@@ -1,0 +1,313 @@
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { height: 100%; }
+
+body {
+  background: #111;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI',
+               system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Ambient background glow ───────────────────────────────────────────────── */
+/* A large blurred blob fixed at the top of the viewport.
+   Its color transitions slowly when a new tile is focused,
+   giving the whole page an ambient tint matching the service. */
+
+#bg-glow {
+  position: fixed;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120vw;
+  height: 75vh;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+  /* Slow color shift — feels like the room lighting is changing */
+  transition: background-color 1.4s ease;
+  will-change: background-color;
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+
+#hero {
+  position: relative;
+  height: clamp(270px, 38vh, 380px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+/* Blurred service logo used as a painterly backdrop */
+#hero-backdrop {
+  position: absolute;
+  /* Oversized so blur doesn't leave transparent edges */
+  inset: -40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  filter: blur(90px) saturate(1.8) brightness(0.45);
+  opacity: 0;
+  /* Backdrop image crossfades in after content is set */
+  transition: background-image 0s, opacity 0.5s ease;
+  will-change: opacity;
+}
+
+#hero-backdrop.loaded {
+  opacity: 1;
+}
+
+/* Multi-layer vignette: top, bottom, and sides all fade to page colour */
+#hero-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,  #111 0%,  transparent 28%, transparent 60%, #111 100%),
+    linear-gradient(to right,   #111 0%,  transparent 18%, transparent 82%, #111 100%);
+  pointer-events: none;
+}
+
+/* Content sits above the backdrop layers */
+#hero-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 22px 48px 32px;
+}
+
+/* ── Top bar ───────────────────────────────────────────────────────────────── */
+
+#top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-brand {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Hero card (focused-service info, also a link) ─────────────────────────── */
+
+#hero-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  text-decoration: none;
+  color: inherit;
+  /* Content fades + slides on each new focus */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  will-change: opacity, transform;
+}
+
+#hero-card:focus-visible {
+  outline: none;
+}
+
+/* ── Hero logo ─────────────────────────────────────────────────────────────── */
+
+#hero-logo-wrap {
+  flex-shrink: 0;
+  width: 82px;
+  height: 82px;
+  position: relative;
+}
+
+#hero-logo {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  border-radius: 18px;
+  filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.55));
+  display: none; /* shown once src loads */
+}
+
+#hero-initial {
+  width: 82px;
+  height: 82px;
+  border-radius: 18px;
+  display: none; /* shown as fallback */
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+/* ── Hero text ─────────────────────────────────────────────────────────────── */
+
+#hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#hero-name {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fff;
+}
+
+#hero-tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.55;
+  max-width: 480px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-top: 1px;
+}
+
+#hero-tagline[hidden] { display: none; }
+
+#hero-domain {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.02em;
+}
+
+/* Subtle caret hinting the card is clickable */
+#hero-card:hover #hero-name {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* ── Tile grid ─────────────────────────────────────────────────────────────── */
+
+.tile-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  gap: 22px;
+  justify-content: center;
+  padding: 28px 28px 80px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Tile ──────────────────────────────────────────────────────────────────── */
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 200px;
+  height: 130px;
+  background: #1e1e1e;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  position: relative;
+
+  /* The transform/glow transitions are managed in JS so the tile
+     tracks the cursor in real-time on hover but springs back on leave.
+     Only non-transform props live here. */
+  transition: border-color 0.15s ease, box-shadow 0.18s ease;
+  will-change: transform;
+}
+
+/* ── Specular shine ────────────────────────────────────────────────────────── */
+/* A soft radial highlight that follows the mouse, mimicking a light source
+   reflecting off a glossy surface — the signature Apple TV tile effect. */
+
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--shine-x, 50%) var(--shine-y, 50%),
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    transparent 68%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.tile:hover::after {
+  opacity: 1;
+}
+
+/* ── Tile logo ─────────────────────────────────────────────────────────────── */
+
+.tile-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* ── Text-initial fallback ─────────────────────────────────────────────────── */
+
+.tile-initial {
+  /* Shown only when the logo image fails — sits above the tile background */
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  flex-shrink: 0;
+  /* background, color, border set via JS */
+}
+
+/* ── Empty / error state ───────────────────────────────────────────────────── */
+
+.grid-message {
+  grid-column: 1 / -1;
+  padding: 80px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.grid-message a {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  #hero-body { padding: 16px 20px 24px; }
+  #hero-name { font-size: 24px; }
+  #hero-tagline { font-size: 12px; -webkit-line-clamp: 2; }
+  #hero-logo, #hero-initial, #hero-logo-wrap { width: 60px; height: 60px; }
+  .tile-grid { gap: 14px; padding: 20px 16px 60px; }
+}

@@ -1,0 +1,13 @@
+services:
+  streaming-launcher:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      # Mount config.json so tile edits survive container rebuilds.
+      # Create the file first: `cp config.json.example config.json` (or just use the repo copy).
+      - ./config.json:/app/config.json
+    environment:
+      PORT: "${PORT:-3000}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}"
+    restart: unless-stopped
