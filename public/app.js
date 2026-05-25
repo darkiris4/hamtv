@@ -99,7 +99,7 @@ function buildTile(data) {
     a.appendChild(makeInitial(data.name));
   }
 
-  attachHoverEvents(a, accent, data);
+  attachTileInteractions(a, accent, data);
   return a;
 }
 
@@ -122,19 +122,42 @@ function buildSettingsTile() {
   img.onerror   = () => img.replaceWith(makeInitial('S'));
   a.appendChild(img);
 
-  attachHoverEvents(a, '#8E8E93', tileData);
+  attachTileInteractions(a, '#8E8E93', tileData);
   return a;
 }
 
-// ── Hover / tilt / specular ───────────────────────────────────────────────────
+// ── Tile interactions — focus drives the hero; hover drives tilt/shine only ────
 
-function attachHoverEvents(a, accent, tileData) {
-  a.addEventListener('mouseenter', () => {
+function attachTileInteractions(a, accent, tileData) {
+  let isFocused = false;
+
+  // Focus → update hero (keyboard nav or click)
+  a.addEventListener('focus', () => {
+    isFocused = true;
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
       `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
     focusTile(tileData, true);
+  });
+
+  a.addEventListener('blur', () => {
+    isFocused = false;
+    a.style.transition =
+      'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), ' +
+      'border-color 0.18s ease, box-shadow 0.18s ease';
+    a.style.transform   = '';
+    a.style.borderColor = 'rgba(255,255,255,0.08)';
+    a.style.boxShadow   = '';
+    focusGlobal(true);
+  });
+
+  // Hover → tile visual effects only, no hero update
+  a.addEventListener('mouseenter', () => {
+    a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
+    a.style.borderColor = 'rgba(255,255,255,0.75)';
+    a.style.boxShadow   =
+      `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
   });
 
   a.addEventListener('mousemove', e => {
@@ -154,10 +177,11 @@ function attachHoverEvents(a, accent, tileData) {
     a.style.transition =
       'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), ' +
       'border-color 0.18s ease, box-shadow 0.18s ease';
-    a.style.transform   = '';
-    a.style.borderColor = 'rgba(255,255,255,0.08)';
-    a.style.boxShadow   = '';
-    focusGlobal(true);
+    a.style.transform = '';
+    if (!isFocused) {
+      a.style.borderColor = 'rgba(255,255,255,0.08)';
+      a.style.boxShadow   = '';
+    }
   });
 }
 
