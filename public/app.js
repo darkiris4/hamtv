@@ -255,22 +255,79 @@ function makeInitial(name) {
 
 // ── Hero DOM refs ─────────────────────────────────────────────────────────────
 
-const heroCard     = document.getElementById('hero-card');
-const heroLogo     = document.getElementById('hero-logo');
-const heroInitial  = document.getElementById('hero-initial');
-const heroName     = document.getElementById('hero-name');
-const heroTagline  = document.getElementById('hero-tagline');
-const heroDomain   = document.getElementById('hero-domain');
-const heroBackdrop = document.getElementById('hero-backdrop');
-const bgGlow       = document.getElementById('bg-glow');
+const heroCard         = document.getElementById('hero-card');
+const heroLogoWrap     = document.getElementById('hero-logo-wrap');
+const heroLogo         = document.getElementById('hero-logo');
+const heroInitial      = document.getElementById('hero-initial');
+const heroName         = document.getElementById('hero-name');
+const heroTagline      = document.getElementById('hero-tagline');
+const heroDomain       = document.getElementById('hero-domain');
+const heroBackdrop     = document.getElementById('hero-backdrop');
+const heroBackdropPrev = document.getElementById('hero-backdrop-prev');
+const bgGlow           = document.getElementById('bg-glow');
 
 let heroTimer;
+
+// Stagger config for hero content transitions: element, delay-ms, duration
+const STAGGER = [
+  { el: heroLogoWrap, delay: 0,   dur: '0.35s' },
+  { el: heroName,     delay: 40,  dur: '1s'    },
+  { el: heroTagline,  delay: 80,  dur: '1s'    },
+  { el: heroDomain,   delay: 110, dur: '1s'    },
+];
 
 // ── Auto-scroll helpers ───────────────────────────────────────────────────────
 
 function stopHeroAutoScroll() {
   clearTimeout(heroAutoTimer);
   heroAutoTimer = null;
+}
+
+// Slide hero content out-left, call applyFn to update data, slide in from right.
+function heroAnimate(applyFn) {
+  STAGGER.forEach(({ el }) => {
+    el.style.transition = 'opacity 0.2s ease-in, transform 0.2s ease-in';
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateX(-40px)';
+  });
+  clearTimeout(heroTimer);
+  heroTimer = setTimeout(() => {
+    applyFn();
+    STAGGER.forEach(({ el }) => {
+      el.style.transition = 'none';
+      el.style.opacity    = '0';
+      el.style.transform  = 'translateX(40px)';
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      STAGGER.forEach(({ el, delay, dur }) => {
+        setTimeout(() => {
+          el.style.transition = `opacity ${dur} ease-out, transform ${dur} ease-out`;
+          el.style.opacity    = '1';
+          el.style.transform  = 'translateX(0)';
+        }, delay);
+      });
+    }));
+  }, 220);
+}
+
+// Skip exit animation; call applyFn immediately then slide content in from right.
+function heroAnimateInitial(applyFn) {
+  clearTimeout(heroTimer);
+  applyFn();
+  STAGGER.forEach(({ el }) => {
+    el.style.transition = 'none';
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateX(40px)';
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    STAGGER.forEach(({ el, delay, dur }) => {
+      setTimeout(() => {
+        el.style.transition = `opacity ${dur} ease-out, transform ${dur} ease-out`;
+        el.style.opacity    = '1';
+        el.style.transform  = 'translateX(0)';
+      }, delay);
+    });
+  }));
 }
 
 // Schedule the next TMDB item advance (5-10s random interval).
@@ -282,20 +339,10 @@ function scheduleHeroScroll() {
   const delay = 5000 + Math.random() * 5000;
   heroAutoTimer = setTimeout(() => {
     autoScrollIndex = (autoScrollIndex + 1) % autoScrollItems.length;
-    heroCard.style.opacity   = '0';
-    heroCard.style.transform = 'translateX(-40px)';
-    clearTimeout(heroTimer);
-    heroTimer = setTimeout(() => {
+    heroAnimate(() => {
       applyHeroContent(autoScrollData, autoScrollAccent, autoScrollItems[autoScrollIndex]);
-      heroCard.style.transition = 'none';
-      heroCard.style.transform  = 'translateX(60px)';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        heroCard.style.transition = '';
-        heroCard.style.opacity    = '1';
-        heroCard.style.transform  = 'translateX(0)';
-        scheduleHeroScroll();
-      }));
-    }, 140);
+    });
+    scheduleHeroScroll();
   }, delay);
 }
 
@@ -313,28 +360,15 @@ function focusTile(data, animate) {
   autoScrollIndex  = autoScrollItems.length
     ? Math.floor(Math.random() * autoScrollItems.length)
     : 0;
-  const item = autoScrollItems[autoScrollIndex] || null;
+  const item    = autoScrollItems[autoScrollIndex] || null;
+  const applyFn = () => applyHeroContent(data, accent, item);
 
-  if (!animate) {
-    applyHeroContent(data, accent, item);
-    scheduleHeroScroll();
-    return;
+  if (animate) {
+    heroAnimate(applyFn);
+  } else {
+    heroAnimateInitial(applyFn);
   }
-
-  heroCard.style.opacity   = '0';
-  heroCard.style.transform = 'translateX(-40px)';
-  clearTimeout(heroTimer);
-  heroTimer = setTimeout(() => {
-    applyHeroContent(data, accent, item);
-    heroCard.style.transition = 'none';
-    heroCard.style.transform  = 'translateX(60px)';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      heroCard.style.transition = '';
-      heroCard.style.opacity    = '1';
-      heroCard.style.transform  = 'translateX(0)';
-      scheduleHeroScroll();
-    }));
-  }, 140);
+  scheduleHeroScroll();
 }
 
 // ── Hero focus — idle (no service hovered) ────────────────────────────────────
@@ -342,22 +376,12 @@ function focusTile(data, animate) {
 function focusGlobal(animate) {
   stopHeroAutoScroll();
   bgGlow.style.backgroundColor = '#1c1c1e';
-  clearTimeout(heroTimer);
 
-  if (!animate) { applyIdleHero(); return; }
-
-  heroCard.style.opacity   = '0';
-  heroCard.style.transform = 'translateX(-40px)';
-  heroTimer = setTimeout(() => {
-    applyIdleHero();
-    heroCard.style.transition = 'none';
-    heroCard.style.transform  = 'translateX(60px)';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      heroCard.style.transition = '';
-      heroCard.style.opacity    = '1';
-      heroCard.style.transform  = 'translateX(0)';
-    }));
-  }, 140);
+  if (animate) {
+    heroAnimate(applyIdleHero);
+  } else {
+    heroAnimateInitial(applyIdleHero);
+  }
 }
 
 function applyIdleHero() {
@@ -370,15 +394,7 @@ function applyIdleHero() {
   heroDomain.textContent  = '';
 
   setHeroBackdrop('/hamtv.png');
-
-  heroLogo.alt     = 'Ham TV';
-  heroLogo.onload  = () => { heroLogo.style.display = 'block'; heroInitial.style.display = 'none'; };
-  heroLogo.onerror = () => { heroLogo.style.display = 'none';  heroInitial.style.display = 'none'; };
-  if (heroLogo.src !== new URL('/hamtv.png', location.href).href) heroLogo.src = '/hamtv.png';
-  if (heroLogo.complete && heroLogo.naturalWidth > 0) {
-    heroLogo.style.display    = 'block';
-    heroInitial.style.display = 'none';
-  }
+  setHeroLogo({ logo: '/hamtv.png', name: 'Ham TV' }, 'rgba(255,255,255,0.6)');
 }
 
 // ── Hero content — tile-specific ──────────────────────────────────────────────
@@ -417,7 +433,12 @@ function applyHeroContent(data, accent, item = null) {
     if (data.logo) {
       setHeroBackdrop(data.logo);
     } else {
-      heroBackdrop.style.backgroundImage = 'none';
+      heroBackdropPrev.style.transition      = 'none';
+      heroBackdropPrev.style.backgroundImage = 'none';
+      heroBackdropPrev.style.opacity         = '0';
+      heroBackdrop.style.transition          = 'none';
+      heroBackdrop.style.backgroundImage     = 'none';
+      heroBackdrop.style.opacity             = '0';
       heroBackdrop.classList.remove('loaded');
     }
 
@@ -428,25 +449,65 @@ function applyHeroContent(data, accent, item = null) {
 // ── Shared hero helpers ───────────────────────────────────────────────────────
 
 function setHeroBackdrop(url) {
-  heroBackdrop.classList.remove('loaded');
+  const curImg     = heroBackdrop.style.backgroundImage;
+  const curOpacity = heroBackdrop.style.opacity || '0';
+
+  // Snapshot current backdrop onto the prev (lower) layer
+  heroBackdropPrev.style.transition      = 'none';
+  heroBackdropPrev.style.backgroundImage = curImg;
+  heroBackdropPrev.style.opacity         = curOpacity;
+  heroBackdropPrev.style.transform       = 'scale(1.02) translateX(0)';
+
+  // Stage new backdrop off-screen right
+  heroBackdrop.style.transition      = 'none';
   heroBackdrop.style.backgroundImage = `url(${url})`;
-  // Double rAF ensures the browser processes the opacity:0 before we fade back in
-  requestAnimationFrame(() => requestAnimationFrame(() =>
-    heroBackdrop.classList.add('loaded')
-  ));
+  heroBackdrop.style.opacity         = '0';
+  heroBackdrop.style.transform       = 'scale(1.02) translateX(60px)';
+  heroBackdrop.classList.remove('loaded');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    // Prev exits left
+    heroBackdropPrev.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    heroBackdropPrev.style.opacity    = '0';
+    heroBackdropPrev.style.transform  = 'scale(1.02) translateX(-40px)';
+
+    // New enters from right
+    heroBackdrop.style.transition = 'opacity 1s ease, transform 1s ease';
+    heroBackdrop.style.opacity    = '1';
+    heroBackdrop.style.transform  = 'scale(1.02) translateX(0)';
+  }));
 }
 
 function setHeroLogo(data, accent) {
   if (!data.logo) { showHeroInitial(data.name, accent); return; }
 
-  heroLogo.alt     = data.name;
-  heroLogo.onload  = () => { heroLogo.style.display = 'block'; heroInitial.style.display = 'none'; };
-  heroLogo.onerror = () => showHeroInitial(data.name, accent);
-  if (heroLogo.src !== new URL(data.logo, location.href).href) heroLogo.src = data.logo;
-  if (heroLogo.complete && heroLogo.naturalWidth > 0) {
+  // Already loaded in the DOM element — show immediately
+  const target = new URL(data.logo, location.href).href;
+  if (heroLogo.src === target && heroLogo.complete && heroLogo.naturalWidth > 0) {
+    heroLogo.style.display    = 'block';
+    heroInitial.style.display = 'none';
+    return;
+  }
+
+  // Show initial as placeholder while the image preloads
+  showHeroInitial(data.name, accent);
+
+  const img = new Image();
+  let settled = false;
+
+  function applyLogo() {
+    if (settled) return;
+    settled               = true;
+    heroLogo.alt          = data.name;
+    heroLogo.src          = data.logo;
     heroLogo.style.display    = 'block';
     heroInitial.style.display = 'none';
   }
+
+  img.onload  = applyLogo;
+  img.onerror = () => { settled = true; }; // keep initial on error
+  img.src     = data.logo;
+  if (img.complete && img.naturalWidth > 0) applyLogo();
 }
 
 function showHeroInitial(name, accent) {

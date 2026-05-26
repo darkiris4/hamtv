@@ -109,14 +109,27 @@ body {
   background-position: center top;
   filter: brightness(0.65);
   opacity: 0;
-  /* Backdrop image crossfades in after content is set */
-  transition: background-image 0s, opacity 0.5s ease;
+  transition: none;
   will-change: opacity;
   transform: scale(1.02);
+  z-index: 1;
 }
 
 #hero-backdrop.loaded {
   opacity: 1;
+}
+
+#hero-backdrop-prev {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+  filter: brightness(0.65);
+  opacity: 0;
+  transition: none;
+  transform: scale(1.02);
+  z-index: 0;
 }
 
 /* Multi-layer vignette: top, bottom, and sides all fade to page colour */
@@ -147,8 +160,6 @@ body {
   text-decoration: none;
   color: inherit;
   border-radius: 18px;
-  /* Content fades + slides on each new focus */
-  transition: opacity 0.2s ease, transform 0.2s ease;
   will-change: opacity, transform;
   /* width fits content so the glass doesn't span the full hero width */
   width: fit-content;
@@ -227,6 +238,11 @@ body {
   justify-content: center;
   font-size: 34px;
   font-weight: 700;
+}
+
+#hero-logo,
+#hero-initial {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* ── Hero text ─────────────────────────────────────────────────────────────── */
