@@ -140,55 +140,6 @@ body {
   padding: 22px 48px 32px;
 }
 
-/* ── Nav bar ───────────────────────────────────────────────────────────────── */
-
-#top-bar {
-  border-radius: 16px;
-  width: fit-content;
-}
-
-#top-bar .lg-overlay-bg {
-  background: rgba(0, 0, 0, 0.28);
-}
-
-#top-bar .lg-content {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 6px 14px 6px 8px;
-  white-space: nowrap;
-}
-
-#nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-#nav-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  object-fit: contain;
-}
-
-#nav-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
-  letter-spacing: -0.01em;
-}
-
-#nav-settings {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-#nav-settings:hover {
-  color: rgba(255, 255, 255, 0.9);
-}
 
 /* ── Hero card (focused-service info, also a link) ─────────────────────────── */
 
