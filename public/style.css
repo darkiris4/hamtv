@@ -146,7 +146,7 @@ body {
 #hero-card {
   text-decoration: none;
   color: inherit;
-  border-radius: 20px;
+  border-radius: 18px;
   /* Content fades + slides on each new focus */
   transition: opacity 0.2s ease, transform 0.2s ease;
   will-change: opacity, transform;
@@ -181,7 +181,7 @@ body {
   top: 22px;
   right: 48px;
   z-index: 3;
-  border-radius: 14px;
+  border-radius: 20px;
 }
 
 #clock-pill .lg-overlay-bg {
@@ -213,7 +213,7 @@ body {
   width: 82px;
   height: 82px;
   object-fit: contain;
-  border-radius: 18px;
+  border-radius: 14px;
   filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.55));
   display: none; /* shown once src loads */
 }
@@ -221,7 +221,7 @@ body {
 #hero-initial {
   width: 82px;
   height: 82px;
-  border-radius: 18px;
+  border-radius: 14px;
   display: none; /* shown as fallback */
   align-items: center;
   justify-content: center;
@@ -306,7 +306,7 @@ body {
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 36px;
+  border-radius: 28px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
@@ -329,7 +329,7 @@ body {
   width: 200px;
   height: 130px;
   background: var(--tile-accent, #1e1e1e);
-  border-radius: 22px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.12);
 
   text-decoration: none;
@@ -390,7 +390,7 @@ body {
   z-index: 1;
   width: 72px;
   height: 72px;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
