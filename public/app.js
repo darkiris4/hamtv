@@ -55,8 +55,18 @@ function setCachedHero(key, data) {
     return;
   }
 
-  for (const tile of tiles) grid.appendChild(buildTile(tile));
-  grid.appendChild(buildSettingsTile());
+  const glassRow   = document.createElement('div');
+  glassRow.className = 'tile-row-glass';
+  const remaining  = document.createElement('div');
+  remaining.className = 'tile-remaining';
+
+  const allTileEls = [...tiles.map(buildTile), buildSettingsTile()];
+  const n = tilesPerRow(grid);
+  allTileEls.slice(0, n).forEach(el => glassRow.appendChild(el));
+  allTileEls.slice(n).forEach(el => remaining.appendChild(el));
+
+  grid.appendChild(glassRow);
+  if (remaining.children.length) grid.appendChild(remaining);
 
   // Initial state — show project logo (no service hovered yet)
   focusGlobal(false);
@@ -79,6 +89,16 @@ function setCachedHero(key, data) {
     }
   }
 }());
+
+// ── Tile row layout ───────────────────────────────────────────────────────────
+
+// How many 200px tiles (22px gap) fit in one row of .tile-row-glass.
+// Glass has 28px horizontal padding on each side, so subtract 56px from
+// the grid's rendered width.
+function tilesPerRow(gridEl) {
+  const available = gridEl.clientWidth - 56;
+  return Math.max(1, Math.floor((available + 22) / 222));
+}
 
 // ── TMDB hero item helpers ────────────────────────────────────────────────────
 
