@@ -129,6 +129,7 @@ label:has(.tray-check:disabled) {
 
 /* ── Inputs ────────────────────────────────────────────────────────────────── */
 
+select,
 input[type="text"],
 input[type="number"],
 input[type="password"] {
@@ -143,6 +144,7 @@ input[type="password"] {
   transition: border-color 0.15s;
 }
 
+select:focus,
 input[type="text"]:focus,
 input[type="number"]:focus,
 input[type="password"]:focus {

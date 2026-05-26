@@ -148,6 +148,9 @@ function buildTile(data) {
     img.loading   = 'lazy';
     img.draggable = false;
     img.onerror   = () => img.replaceWith(makeInitial(data.name));
+    if (data.logoPadding) img.style.padding = `${data.logoPadding}px`;
+    if (data.logoFit === 'fill-v') { img.style.width = 'auto';  img.style.height = '100%'; }
+    if (data.logoFit === 'fill-h') { img.style.width = '100%';  img.style.height = 'auto'; }
     a.appendChild(img);
   } else {
     a.appendChild(makeInitial(data.name));
@@ -160,8 +163,8 @@ function buildTile(data) {
 // ── Settings tile ─────────────────────────────────────────────────────────────
 
 function buildSettingsTile() {
-  const GRAY = '#3A3A3C';
-  const LOGO = 'https://i.pinimg.com/1200x/52/e3/4c/52e34cdb514c7c65600eb18604a3903c.jpg';
+  const GRAY = '#86878b';
+  const LOGO = '/icons/settings.png';
   const tileData = { name: 'Settings', url: '/admin', logo: LOGO, color: GRAY, newTab: false };
 
   const a       = document.createElement('a');
@@ -174,10 +177,12 @@ function buildSettingsTile() {
   img.src       = LOGO;
   img.alt       = 'Settings';
   img.draggable = false;
-  img.onerror   = () => img.replaceWith(makeInitial('S'));
+  img.onerror       = () => img.replaceWith(makeInitial('S'));
+  img.style.width   = 'auto';
+  img.style.height  = '100%';
   a.appendChild(img);
 
-  attachTileInteractions(a, '#8E8E93', tileData);
+  attachTileInteractions(a, '#86878b', tileData);
   return a;
 }
 
@@ -393,7 +398,7 @@ function applyIdleHero() {
   heroTagline.hidden      = true;
   heroDomain.textContent  = '';
 
-  setHeroBackdrop('/hamtv.png');
+  setHeroBackdrop('/hamtv.png', 'auto 100%', 'center center');
   setHeroLogo({ logo: '/hamtv.png', name: 'Ham TV' }, 'rgba(255,255,255,0.6)');
 }
 
@@ -431,7 +436,7 @@ function applyHeroContent(data, accent, item = null) {
     }
 
     if (data.logo) {
-      setHeroBackdrop(data.logo);
+      setHeroBackdrop(data.logo, 'auto 100%', 'center center');
     } else {
       heroBackdropPrev.style.transition      = 'none';
       heroBackdropPrev.style.backgroundImage = 'none';
@@ -448,21 +453,27 @@ function applyHeroContent(data, accent, item = null) {
 
 // ── Shared hero helpers ───────────────────────────────────────────────────────
 
-function setHeroBackdrop(url) {
-  const curImg     = heroBackdrop.style.backgroundImage;
-  const curOpacity = heroBackdrop.style.opacity || '0';
+function setHeroBackdrop(url, size = 'cover', position = 'center top') {
+  const curImg      = heroBackdrop.style.backgroundImage;
+  const curOpacity  = heroBackdrop.style.opacity || '0';
+  const curSize     = heroBackdrop.style.backgroundSize     || 'cover';
+  const curPosition = heroBackdrop.style.backgroundPosition || 'center top';
 
   // Snapshot current backdrop onto the prev (lower) layer
-  heroBackdropPrev.style.transition      = 'none';
-  heroBackdropPrev.style.backgroundImage = curImg;
-  heroBackdropPrev.style.opacity         = curOpacity;
-  heroBackdropPrev.style.transform       = 'scale(1.02) translateX(0)';
+  heroBackdropPrev.style.transition          = 'none';
+  heroBackdropPrev.style.backgroundImage     = curImg;
+  heroBackdropPrev.style.backgroundSize      = curSize;
+  heroBackdropPrev.style.backgroundPosition  = curPosition;
+  heroBackdropPrev.style.opacity             = curOpacity;
+  heroBackdropPrev.style.transform           = 'scale(1.02) translateX(0)';
 
   // Stage new backdrop off-screen right
-  heroBackdrop.style.transition      = 'none';
-  heroBackdrop.style.backgroundImage = `url(${url})`;
-  heroBackdrop.style.opacity         = '0';
-  heroBackdrop.style.transform       = 'scale(1.02) translateX(60px)';
+  heroBackdrop.style.transition          = 'none';
+  heroBackdrop.style.backgroundImage     = `url(${url})`;
+  heroBackdrop.style.backgroundSize      = size;
+  heroBackdrop.style.backgroundPosition  = position;
+  heroBackdrop.style.opacity             = '0';
+  heroBackdrop.style.transform           = 'scale(1.02) translateX(60px)';
   heroBackdrop.classList.remove('loaded');
 
   requestAnimationFrame(() => requestAnimationFrame(() => {

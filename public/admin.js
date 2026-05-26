@@ -7,7 +7,7 @@ let tiles = [];
 document.addEventListener('DOMContentLoaded', loadConfig);
 
 document.getElementById('add-btn').addEventListener('click', () => {
-  tiles.push({ name: 'New Service', url: 'https://', logo: '', color: '#ffffff', newTab: false, inTray: false, tmdb_provider_id: null });
+  tiles.push({ name: 'New Service', url: 'https://', logo: '', color: '#ffffff', newTab: false, inTray: false, tmdb_provider_id: null, logoPadding: 0, logoFit: 'contain' });
   renderList();
   document.querySelectorAll('.tile-row').item(tiles.length - 1)
     ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -96,6 +96,34 @@ function buildRow(tile, index) {
   });
   tmdbLabel.appendChild(tmdbInput);
   fields.appendChild(tmdbLabel);
+
+  const padLabel       = document.createElement('label');
+  padLabel.textContent = 'Logo Pad';
+  const padInput       = document.createElement('input');
+  padInput.type        = 'number';
+  padInput.value       = tile.logoPadding ?? 0;
+  padInput.min         = '0';
+  padInput.max         = '60';
+  padInput.placeholder = '0';
+  padInput.addEventListener('input', e => {
+    tiles[index].logoPadding = parseInt(e.target.value, 10) || 0;
+  });
+  padLabel.appendChild(padInput);
+  fields.appendChild(padLabel);
+
+  const fitLabel       = document.createElement('label');
+  fitLabel.textContent = 'Logo Fit';
+  const fitSelect      = document.createElement('select');
+  [['contain', 'Contain'], ['fill-v', 'Fill Vertical'], ['fill-h', 'Fill Horizontal']].forEach(([val, text]) => {
+    const opt       = document.createElement('option');
+    opt.value       = val;
+    opt.textContent = text;
+    if ((tile.logoFit || 'contain') === val) opt.selected = true;
+    fitSelect.appendChild(opt);
+  });
+  fitSelect.addEventListener('change', e => { tiles[index].logoFit = e.target.value; });
+  fitLabel.appendChild(fitSelect);
+  fields.appendChild(fitLabel);
 
   // Checkboxes row — new-tab + in-tray, both span all columns
   const newTabLabel     = document.createElement('label');
