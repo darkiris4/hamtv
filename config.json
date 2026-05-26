@@ -5,7 +5,8 @@
     "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/apple-tv-plus-light.svg",
     "color": "#1C1C1E",
     "newTab": false,
-    "tmdb_provider_id": 350
+    "tmdb_provider_id": 350,
+    "inTray": true
   },
   {
     "name": "Jellyfin",
@@ -13,7 +14,8 @@
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg",
     "color": "#000000",
     "newTab": false,
-    "tmdb_provider_id": null
+    "tmdb_provider_id": null,
+    "inTray": true
   },
   {
     "name": "Hulu",
@@ -21,7 +23,8 @@
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/hulu.svg",
     "color": "#000000",
     "newTab": false,
-    "tmdb_provider_id": 15
+    "tmdb_provider_id": 15,
+    "inTray": true
   },
   {
     "name": "Disney+",
@@ -29,7 +32,8 @@
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/disney-plus.svg",
     "color": "#0063E5",
     "newTab": false,
-    "tmdb_provider_id": 337
+    "tmdb_provider_id": 337,
+    "inTray": true
   },
   {
     "name": "Peacock",
@@ -37,7 +41,8 @@
     "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/peacock-light.svg",
     "color": "#F5A623",
     "newTab": false,
-    "tmdb_provider_id": 386
+    "tmdb_provider_id": 386,
+    "inTray": true
   },
   {
     "name": "Paramount+",
@@ -45,7 +50,8 @@
     "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/paramount-plus-dark.svg",
     "color": "#0064FF",
     "newTab": false,
-    "tmdb_provider_id": 531
+    "tmdb_provider_id": 531,
+    "inTray": true
   },
   {
     "name": "Prime Video",
@@ -67,7 +73,7 @@
     "name": "Apple Fitness+",
     "url": "https://fitness.apple.com",
     "logo": "/icons/fitness.png",
-    "color": "#FF2D55",
+    "color": "#000000",
     "newTab": false,
     "tmdb_provider_id": null
   },
