@@ -126,7 +126,7 @@ function buildSettingsTile() {
   return a;
 }
 
-// ── Tile interactions — focus drives the hero; hover drives tilt/shine only ────
+// ── Tile interactions — hover and focus both drive the hero; hover also drives tilt/shine ──
 
 function attachTileInteractions(a, accent, tileData) {
   let isFocused = false;
@@ -152,12 +152,13 @@ function attachTileInteractions(a, accent, tileData) {
     focusGlobal(true);
   });
 
-  // Hover → tile visual effects only, no hero update
+  // Hover → tile visual effects + hero update
   a.addEventListener('mouseenter', () => {
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
       `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
+    focusTile(tileData, true);
   });
 
   a.addEventListener('mousemove', e => {
