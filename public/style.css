@@ -132,20 +132,21 @@ body {
   z-index: 0;
 }
 
-/* Multi-layer vignette: top, bottom, and sides all fade to page colour */
+/* Vignette: bottom and left edges fade to page colour */
 #hero-vignette {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background:
-    linear-gradient(to bottom,  #111 0%,  transparent 28%, transparent 60%, #111 100%),
-    linear-gradient(to right,   #111 0%,  transparent 18%, transparent 82%, #111 100%);
+    linear-gradient(to top,   #111 0%,  transparent 38%),
+    linear-gradient(to right, #111 0%,  transparent 28%);
   pointer-events: none;
 }
 
 /* Content sits above the backdrop layers */
 #hero-body {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
