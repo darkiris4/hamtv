@@ -96,6 +96,13 @@ body {
   color: #555;
 }
 
+/* Dim tray-check labels when their checkbox is disabled (limit reached) */
+label:has(.tray-check:disabled) {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* New-tab checkbox spans the full width of the fields grid */
 .field-newtab {
   grid-column: 1 / -1;

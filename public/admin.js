@@ -115,6 +115,10 @@ function buildRow(tile, index) {
   trayInput.className = 'tray-check';
   trayInput.checked   = !!tile.inTray;
   trayInput.addEventListener('change', e => {
+    if (e.target.checked && tiles.filter(t => t.inTray).length >= 6) {
+      e.target.checked = false;
+      return;
+    }
     tiles[index].inTray = e.target.checked;
     syncTrayCheckboxes();
   });
