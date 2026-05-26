@@ -221,9 +221,9 @@ body {
 
   width: 200px;
   height: 130px;
-  background: #1e1e1e;
+  background: var(--tile-accent, #1e1e1e);
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.12);
 
   text-decoration: none;
   color: inherit;

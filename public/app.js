@@ -84,6 +84,7 @@ function buildTile(data) {
   a.className  = 'tile';
   a.href       = data.url;
   a.title      = data.name;
+  a.style.setProperty('--tile-accent', data.color || '#1e1e1e');
   if (data.newTab) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
 
   if (data.logo) {
@@ -114,6 +115,7 @@ function buildSettingsTile() {
   a.className   = 'tile';
   a.href        = '/admin';
   a.title       = 'Settings';
+  a.style.setProperty('--tile-accent', GRAY);
   const img     = document.createElement('img');
   img.className = 'tile-logo';
   img.src       = LOGO;

@@ -2,7 +2,7 @@
   {
     "name": "Apple TV",
     "url": "https://tv.apple.com",
-    "logo": "/icons/appletv.png",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/apple-tv-plus-light.svg",
     "color": "#1C1C1E",
     "newTab": false,
     "tmdb_provider_id": 350
@@ -10,23 +10,23 @@
   {
     "name": "Jellyfin",
     "url": "https://roadtrip.hamlan.io",
-    "logo": "/icons/jellyfin.png",
-    "color": "#00A4DC",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg",
+    "color": "#000000",
     "newTab": false,
     "tmdb_provider_id": null
   },
   {
     "name": "Hulu",
     "url": "https://www.hulu.com",
-    "logo": "/icons/hulu.jpg",
-    "color": "#1CE783",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/hulu.svg",
+    "color": "#000000",
     "newTab": false,
     "tmdb_provider_id": 15
   },
   {
     "name": "Disney+",
     "url": "https://www.disneyplus.com",
-    "logo": "/icons/disneyplus.jpg",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/disney-plus.svg",
     "color": "#0063E5",
     "newTab": false,
     "tmdb_provider_id": 337
@@ -34,7 +34,7 @@
   {
     "name": "Peacock",
     "url": "https://www.peacocktv.com",
-    "logo": "/icons/peacock.jpg",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/peacock-light.svg",
     "color": "#F5A623",
     "newTab": false,
     "tmdb_provider_id": 386
@@ -42,7 +42,7 @@
   {
     "name": "Paramount+",
     "url": "https://www.paramountplus.com",
-    "logo": "/icons/paramount.jpg",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/paramount-plus-dark.svg",
     "color": "#0064FF",
     "newTab": false,
     "tmdb_provider_id": 531
@@ -50,16 +50,16 @@
   {
     "name": "Prime Video",
     "url": "https://www.primevideo.com",
-    "logo": "/icons/prime.jpg",
-    "color": "#00A8E1",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/prime-video.svg",
+    "color": "#000000",
     "newTab": false,
     "tmdb_provider_id": 9
   },
   {
     "name": "YouTube",
     "url": "https://www.youtube.com",
-    "logo": "/icons/youtube.jpg",
-    "color": "#FF0000",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/youtube.svg",
+    "color": "#ffffff",
     "newTab": false,
     "tmdb_provider_id": 192
   },
@@ -74,7 +74,7 @@
   {
     "name": "Apple Music",
     "url": "https://music.apple.com/us/new",
-    "logo": "/icons/applemusic.png",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/apple-music.svg",
     "color": "#FC3C44",
     "newTab": false,
     "tmdb_provider_id": null
