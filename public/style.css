@@ -288,18 +288,20 @@ body {
   margin: 0 auto;
 }
 
-/* Glass tray — first row only, anchored to the bottom of #hero. */
+/* Glass tray — first row only, anchored to the bottom of #hero.
+   grid-auto-flow: column gives one column per tile so the tray
+   hugs its content; left+transform centers it. */
 .tile-row-glass {
   position: absolute;
   bottom: 0;
-  left: 28px;
-  right: 28px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 4;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 200px);
+  grid-auto-flow: column;
+  grid-auto-columns: 200px;
   gap: 22px;
-  justify-content: center;
-  padding: 18px 0;
+  padding: 18px 28px;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
@@ -419,6 +421,6 @@ body {
   #hero-name { font-size: 24px; }
   #hero-tagline { font-size: 12px; -webkit-line-clamp: 2; line-clamp: 2; }
   #hero-logo, #hero-initial, #hero-logo-wrap { width: 60px; height: 60px; }
-  .tile-row-glass { left: 16px; right: 16px; padding: 14px 0; gap: 14px; }
+  .tile-row-glass { padding: 14px 16px; gap: 14px; }
   .tile-remaining { gap: 14px; padding: 16px 16px 60px; }
 }
