@@ -43,6 +43,7 @@ let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
 
   for (const tile of tiles) grid.appendChild(buildTile(tile));
   grid.appendChild(buildSettingsTile());
+  if (window.LiquidGlass) window.LiquidGlass.init();
 
   // Initial state — show project logo (no service hovered yet)
   focusGlobal(false);
@@ -81,11 +82,17 @@ function pickRandom(arr) {
 function buildTile(data) {
   const accent = data.color || 'rgba(255,255,255,0.6)';
   const a      = document.createElement('a');
-  a.className  = 'tile';
+  a.className  = 'tile liquid-glass';
   a.href       = data.url;
   a.title      = data.name;
   a.style.setProperty('--tile-accent', data.color || '#1e1e1e');
   if (data.newTab) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lg-overlay-bg';
+
+  const content = document.createElement('div');
+  content.className = 'lg-content';
 
   if (data.logo) {
     const img     = document.createElement('img');
@@ -95,10 +102,26 @@ function buildTile(data) {
     img.loading   = 'lazy';
     img.draggable = false;
     img.onerror   = () => img.replaceWith(makeInitial(data.name));
-    a.appendChild(img);
+    content.appendChild(img);
   } else {
-    a.appendChild(makeInitial(data.name));
+    content.appendChild(makeInitial(data.name));
   }
+
+  const filterLayer = document.createElement('div');
+  filterLayer.className = 'lg-filter-layer';
+  const glassBox = document.createElement('div');
+  glassBox.className        = 'glass-box glass-transparent';
+  glassBox.dataset.blur      = '0';
+  glassBox.dataset.cab       = '2';
+  glassBox.dataset.depth     = '10';
+  glassBox.dataset.strength  = '100';
+  glassBox.dataset.saturate  = '1.2';
+  glassBox.dataset.brightness= '1.6';
+  filterLayer.appendChild(glassBox);
+
+  a.appendChild(overlay);
+  a.appendChild(content);
+  a.appendChild(filterLayer);
 
   attachTileInteractions(a, accent, data);
   return a;
@@ -111,18 +134,41 @@ function buildSettingsTile() {
   const LOGO = 'https://i.pinimg.com/1200x/52/e3/4c/52e34cdb514c7c65600eb18604a3903c.jpg';
   const tileData = { name: 'Settings', url: '/admin', logo: LOGO, color: GRAY, newTab: false };
 
-  const a       = document.createElement('a');
-  a.className   = 'tile';
-  a.href        = '/admin';
-  a.title       = 'Settings';
+  const a     = document.createElement('a');
+  a.className = 'tile liquid-glass';
+  a.href      = '/admin';
+  a.title     = 'Settings';
   a.style.setProperty('--tile-accent', GRAY);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lg-overlay-bg';
+
+  const content = document.createElement('div');
+  content.className = 'lg-content';
+
   const img     = document.createElement('img');
   img.className = 'tile-logo';
   img.src       = LOGO;
   img.alt       = 'Settings';
   img.draggable = false;
   img.onerror   = () => img.replaceWith(makeInitial('S'));
-  a.appendChild(img);
+  content.appendChild(img);
+
+  const filterLayer = document.createElement('div');
+  filterLayer.className = 'lg-filter-layer';
+  const glassBox = document.createElement('div');
+  glassBox.className         = 'glass-box glass-transparent';
+  glassBox.dataset.blur      = '0';
+  glassBox.dataset.cab       = '2';
+  glassBox.dataset.depth     = '10';
+  glassBox.dataset.strength  = '100';
+  glassBox.dataset.saturate  = '1.2';
+  glassBox.dataset.brightness= '1.6';
+  filterLayer.appendChild(glassBox);
+
+  a.appendChild(overlay);
+  a.appendChild(content);
+  a.appendChild(filterLayer);
 
   attachTileInteractions(a, '#8E8E93', tileData);
   return a;
@@ -136,6 +182,7 @@ function attachTileInteractions(a, accent, tileData) {
   // Focus → update hero (keyboard nav or click)
   a.addEventListener('focus', () => {
     isFocused = true;
+    a.classList.add('lg-focused');
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
@@ -145,6 +192,7 @@ function attachTileInteractions(a, accent, tileData) {
 
   a.addEventListener('blur', () => {
     isFocused = false;
+    a.classList.remove('lg-focused');
     a.style.transition =
       'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), ' +
       'border-color 0.18s ease, box-shadow 0.18s ease';
@@ -156,6 +204,7 @@ function attachTileInteractions(a, accent, tileData) {
 
   // Hover → tile visual effects + hero update
   a.addEventListener('mouseenter', () => {
+    a.classList.add('lg-focused');
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
@@ -182,6 +231,7 @@ function attachTileInteractions(a, accent, tileData) {
       'border-color 0.18s ease, box-shadow 0.18s ease';
     a.style.transform = '';
     if (!isFocused) {
+      a.classList.remove('lg-focused');
       a.style.borderColor = 'rgba(255,255,255,0.08)';
       a.style.boxShadow   = '';
     }

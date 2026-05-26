@@ -21,20 +21,41 @@
 
     <div id="hero-body">
 
-      <!-- App identity bar -->
-      <div id="top-bar">
-      </div>
-
-      <!-- Focused-service card (becomes an anchor link to that service) -->
-      <a id="hero-card" href="#" tabindex="-1">
-        <div id="hero-logo-wrap">
-          <img id="hero-logo" src="" alt="" draggable="false">
-          <div id="hero-initial" aria-hidden="true"></div>
+      <!-- Nav bar -->
+      <nav id="top-bar" class="liquid-glass">
+        <div class="lg-overlay-bg"></div>
+        <div class="lg-content">
+          <div id="nav-brand">
+            <img src="/hamtv.png" id="nav-logo" alt="hamTV" draggable="false">
+            <span id="nav-title">hamTV</span>
+          </div>
+          <a href="/admin" id="nav-settings">Settings</a>
         </div>
-        <div id="hero-meta">
-          <h1 id="hero-name"></h1>
-          <p  id="hero-tagline"></p>
-          <p  id="hero-domain"></p>
+        <div class="lg-filter-layer">
+          <div class="glass-box glass-transparent"
+               data-blur="0" data-cab="2" data-depth="10"
+               data-strength="100" data-saturate="1.5" data-brightness="1.1"></div>
+        </div>
+      </nav>
+
+      <!-- Focused-service card (liquid glass overlay on the hero backdrop) -->
+      <a id="hero-card" href="#" tabindex="-1" class="liquid-glass">
+        <div class="lg-overlay-bg"></div>
+        <div class="lg-content">
+          <div id="hero-logo-wrap">
+            <img id="hero-logo" src="" alt="" draggable="false">
+            <div id="hero-initial" aria-hidden="true"></div>
+          </div>
+          <div id="hero-meta">
+            <h1 id="hero-name"></h1>
+            <p  id="hero-tagline"></p>
+            <p  id="hero-domain"></p>
+          </div>
+        </div>
+        <div class="lg-filter-layer">
+          <div class="glass-box glass-transparent"
+               data-blur="0" data-cab="2" data-depth="10"
+               data-strength="100" data-saturate="1.5" data-brightness="1.1"></div>
         </div>
       </a>
 
@@ -44,6 +65,7 @@
   <!-- Tile grid -->
   <main id="grid" class="tile-grid"></main>
 
+  <script src="liquid-glass.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

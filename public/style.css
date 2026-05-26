@@ -43,6 +43,48 @@ body {
   will-change: background-color;
 }
 
+/* ── Liquid Glass ──────────────────────────────────────────────────────────── */
+
+.liquid-glass {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dark semi-transparent overlay — sits between backdrop and content */
+.lg-overlay-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Content layer — always on top of the filter */
+.lg-content {
+  position: relative;
+  z-index: 3;
+}
+
+/* Filter layer — holds the glass-box that carries the backdrop-filter */
+.lg-filter-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* The element whose backdrop-filter does the refraction work.
+   Width/height are set by liquid-glass.js to match .lg-content. */
+.glass-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.glass-box.glass-transparent {
+  /* Subtle inner rim — visible when the glass layer is active */
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+}
+
 /* ── Hero ──────────────────────────────────────────────────────────────────── */
 
 #hero {
@@ -71,7 +113,6 @@ body {
   transition: background-image 0s, opacity 0.5s ease;
   will-change: opacity;
   transform: scale(1.02);
-
 }
 
 #hero-backdrop.loaded {
@@ -99,30 +140,87 @@ body {
   padding: 22px 48px 32px;
 }
 
-/* ── Top bar ───────────────────────────────────────────────────────────────── */
+/* ── Nav bar ───────────────────────────────────────────────────────────────── */
 
 #top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  border-radius: 16px;
+  width: fit-content;
 }
 
+#top-bar .lg-overlay-bg {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+#top-bar .lg-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 6px 14px 6px 8px;
+  white-space: nowrap;
+}
+
+#nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+#nav-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+#nav-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.01em;
+}
+
+#nav-settings {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+#nav-settings:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
 
 /* ── Hero card (focused-service info, also a link) ─────────────────────────── */
 
 #hero-card {
-  display: flex;
-  align-items: center;
-  gap: 28px;
   text-decoration: none;
   color: inherit;
+  border-radius: 20px;
   /* Content fades + slides on each new focus */
   transition: opacity 0.2s ease, transform 0.2s ease;
   will-change: opacity, transform;
+  /* width fits content so the glass doesn't span the full hero width */
+  width: fit-content;
 }
 
 #hero-card:focus-visible {
   outline: none;
+}
+
+#hero-card .lg-overlay-bg {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+#hero-card .lg-content {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 16px 20px;
+}
+
+/* Subtle caret hinting the card is clickable */
+#hero-card:hover #hero-name {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 /* ── Hero logo ─────────────────────────────────────────────────────────────── */
@@ -191,11 +289,6 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* Subtle caret hinting the card is clickable */
-#hero-card:hover #hero-name {
-  color: rgba(255, 255, 255, 0.88);
-}
-
 /* ── Tile grid ─────────────────────────────────────────────────────────────── */
 
 .tile-grid {
@@ -240,6 +333,32 @@ body {
   will-change: transform;
 }
 
+/* Tile content layer fills the tile so logo percentages are preserved */
+.tile .lg-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tile overlay: white tint for button-mode glass */
+.tile .lg-overlay-bg {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Glass layers hidden until the tile is hovered/focused */
+.tile .lg-overlay-bg,
+.tile .lg-filter-layer {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tile.lg-focused .lg-overlay-bg,
+.tile.lg-focused .lg-filter-layer {
+  opacity: 1;
+}
+
 /* ── Specular shine ────────────────────────────────────────────────────────── */
 /* A soft radial highlight that follows the mouse, mimicking a light source
    reflecting off a glossy surface — the signature Apple TV tile effect. */
@@ -258,6 +377,7 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
+  z-index: 4; /* above glass layers */
 }
 
 .tile:hover::after {
