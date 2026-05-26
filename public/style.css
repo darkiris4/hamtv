@@ -159,7 +159,7 @@ body {
 }
 
 #hero-card .lg-overlay-bg {
-  background: rgba(0, 0, 0, 0.32);
+  background: rgba(0, 0, 0, 0.10);
 }
 
 #hero-card .lg-content {
@@ -172,6 +172,32 @@ body {
 /* Subtle caret hinting the card is clickable */
 #hero-card:hover #hero-name {
   color: rgba(255, 255, 255, 0.88);
+}
+
+/* ── Clock pill ────────────────────────────────────────────────────────────── */
+
+#clock-pill {
+  position: absolute;
+  top: 22px;
+  right: 48px;
+  z-index: 3;
+  border-radius: 14px;
+}
+
+#clock-pill .lg-overlay-bg {
+  background: rgba(0, 0, 0, 0.20);
+}
+
+#clock-pill .lg-content {
+  padding: 8px 18px;
+}
+
+#clock-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Hero logo ─────────────────────────────────────────────────────────────── */
@@ -284,31 +310,7 @@ body {
   will-change: transform;
 }
 
-/* Tile content layer fills the tile so logo percentages are preserved */
-.tile .lg-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
 
-/* Tile overlay: white tint for button-mode glass */
-.tile .lg-overlay-bg {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Glass layers hidden until the tile is hovered/focused */
-.tile .lg-overlay-bg,
-.tile .lg-filter-layer {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.tile.lg-focused .lg-overlay-bg,
-.tile.lg-focused .lg-filter-layer {
-  opacity: 1;
-}
 
 /* ── Specular shine ────────────────────────────────────────────────────────── */
 /* A soft radial highlight that follows the mouse, mimicking a light source

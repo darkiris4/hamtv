@@ -12,6 +12,15 @@ let autoScrollData   = null;
 let autoScrollAccent = null;
 let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
 
+// ── Hero content cache (sessionStorage, per-tab) ──────────────────────────────
+
+function getCachedHero(key) {
+  try { return JSON.parse(sessionStorage.getItem(`hamtv_hero_${key}`)) ?? null; } catch { return null; }
+}
+function setCachedHero(key, data) {
+  try { sessionStorage.setItem(`hamtv_hero_${key}`, JSON.stringify(data)); } catch {}
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 (async function init() {
@@ -19,14 +28,19 @@ let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
 
   let tiles;
   try {
-    // Fetch config and global hero in parallel; hero failure is non-fatal
+    const cachedGlobal = getCachedHero('__global__');
     const [configRes, heroRes] = await Promise.all([
       fetch('/api/config'),
-      fetch('/api/hero').catch(() => null),
+      cachedGlobal ? Promise.resolve(null) : fetch('/api/hero').catch(() => null),
     ]);
     if (!configRes.ok) throw new Error(`HTTP ${configRes.status}`);
     tiles = await configRes.json();
-    if (heroRes?.ok) globalHeroItems = await heroRes.json().catch(() => []);
+    if (cachedGlobal) {
+      globalHeroItems = cachedGlobal;
+    } else if (heroRes?.ok) {
+      globalHeroItems = await heroRes.json().catch(() => []);
+      if (globalHeroItems.length) setCachedHero('__global__', globalHeroItems);
+    }
   } catch (err) {
     grid.innerHTML =
       '<p class="grid-message">Could not load tiles — is the server running?</p>';
@@ -43,7 +57,6 @@ let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
 
   for (const tile of tiles) grid.appendChild(buildTile(tile));
   grid.appendChild(buildSettingsTile());
-  if (window.LiquidGlass) window.LiquidGlass.init();
 
   // Initial state — show project logo (no service hovered yet)
   focusGlobal(false);
@@ -51,10 +64,18 @@ let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
   // Background-prefetch per-provider content so hovers are instant
   for (const tile of tiles) {
     if (tile.tmdb_provider_id != null) {
-      fetch(`/api/hero/${tile.tmdb_provider_id}`)
-        .then(r => r.ok ? r.json() : [])
-        .then(items => { if (items.length) providerCache[tile.tmdb_provider_id] = items; })
-        .catch(() => {});
+      const pid    = tile.tmdb_provider_id;
+      const cached = getCachedHero(pid);
+      if (cached) {
+        providerCache[pid] = cached;
+      } else {
+        fetch(`/api/hero/${pid}`)
+          .then(r => r.ok ? r.json() : [])
+          .then(items => {
+            if (items.length) { providerCache[pid] = items; setCachedHero(pid, items); }
+          })
+          .catch(() => {});
+      }
     }
   }
 }());
@@ -82,17 +103,11 @@ function pickRandom(arr) {
 function buildTile(data) {
   const accent = data.color || 'rgba(255,255,255,0.6)';
   const a      = document.createElement('a');
-  a.className  = 'tile liquid-glass';
+  a.className  = 'tile';
   a.href       = data.url;
   a.title      = data.name;
   a.style.setProperty('--tile-accent', data.color || '#1e1e1e');
   if (data.newTab) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
-
-  const overlay = document.createElement('div');
-  overlay.className = 'lg-overlay-bg';
-
-  const content = document.createElement('div');
-  content.className = 'lg-content';
 
   if (data.logo) {
     const img     = document.createElement('img');
@@ -102,26 +117,10 @@ function buildTile(data) {
     img.loading   = 'lazy';
     img.draggable = false;
     img.onerror   = () => img.replaceWith(makeInitial(data.name));
-    content.appendChild(img);
+    a.appendChild(img);
   } else {
-    content.appendChild(makeInitial(data.name));
+    a.appendChild(makeInitial(data.name));
   }
-
-  const filterLayer = document.createElement('div');
-  filterLayer.className = 'lg-filter-layer';
-  const glassBox = document.createElement('div');
-  glassBox.className        = 'glass-box glass-transparent';
-  glassBox.dataset.blur      = '0';
-  glassBox.dataset.cab       = '2';
-  glassBox.dataset.depth     = '10';
-  glassBox.dataset.strength  = '100';
-  glassBox.dataset.saturate  = '1.2';
-  glassBox.dataset.brightness= '1.6';
-  filterLayer.appendChild(glassBox);
-
-  a.appendChild(overlay);
-  a.appendChild(content);
-  a.appendChild(filterLayer);
 
   attachTileInteractions(a, accent, data);
   return a;
@@ -134,41 +133,18 @@ function buildSettingsTile() {
   const LOGO = 'https://i.pinimg.com/1200x/52/e3/4c/52e34cdb514c7c65600eb18604a3903c.jpg';
   const tileData = { name: 'Settings', url: '/admin', logo: LOGO, color: GRAY, newTab: false };
 
-  const a     = document.createElement('a');
-  a.className = 'tile liquid-glass';
-  a.href      = '/admin';
-  a.title     = 'Settings';
+  const a       = document.createElement('a');
+  a.className   = 'tile';
+  a.href        = '/admin';
+  a.title       = 'Settings';
   a.style.setProperty('--tile-accent', GRAY);
-
-  const overlay = document.createElement('div');
-  overlay.className = 'lg-overlay-bg';
-
-  const content = document.createElement('div');
-  content.className = 'lg-content';
-
   const img     = document.createElement('img');
   img.className = 'tile-logo';
   img.src       = LOGO;
   img.alt       = 'Settings';
   img.draggable = false;
   img.onerror   = () => img.replaceWith(makeInitial('S'));
-  content.appendChild(img);
-
-  const filterLayer = document.createElement('div');
-  filterLayer.className = 'lg-filter-layer';
-  const glassBox = document.createElement('div');
-  glassBox.className         = 'glass-box glass-transparent';
-  glassBox.dataset.blur      = '0';
-  glassBox.dataset.cab       = '2';
-  glassBox.dataset.depth     = '10';
-  glassBox.dataset.strength  = '100';
-  glassBox.dataset.saturate  = '1.2';
-  glassBox.dataset.brightness= '1.6';
-  filterLayer.appendChild(glassBox);
-
-  a.appendChild(overlay);
-  a.appendChild(content);
-  a.appendChild(filterLayer);
+  a.appendChild(img);
 
   attachTileInteractions(a, '#8E8E93', tileData);
   return a;
@@ -182,7 +158,6 @@ function attachTileInteractions(a, accent, tileData) {
   // Focus → update hero (keyboard nav or click)
   a.addEventListener('focus', () => {
     isFocused = true;
-    a.classList.add('lg-focused');
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
@@ -192,7 +167,6 @@ function attachTileInteractions(a, accent, tileData) {
 
   a.addEventListener('blur', () => {
     isFocused = false;
-    a.classList.remove('lg-focused');
     a.style.transition =
       'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), ' +
       'border-color 0.18s ease, box-shadow 0.18s ease';
@@ -204,7 +178,6 @@ function attachTileInteractions(a, accent, tileData) {
 
   // Hover → tile visual effects + hero update
   a.addEventListener('mouseenter', () => {
-    a.classList.add('lg-focused');
     a.style.transition  = 'border-color 0.12s ease, box-shadow 0.15s ease';
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
@@ -231,7 +204,6 @@ function attachTileInteractions(a, accent, tileData) {
       'border-color 0.18s ease, box-shadow 0.18s ease';
     a.style.transform = '';
     if (!isFocused) {
-      a.classList.remove('lg-focused');
       a.style.borderColor = 'rgba(255,255,255,0.08)';
       a.style.boxShadow   = '';
     }
@@ -280,13 +252,18 @@ function scheduleHeroScroll() {
   heroAutoTimer = setTimeout(() => {
     autoScrollIndex = (autoScrollIndex + 1) % autoScrollItems.length;
     heroCard.style.opacity   = '0';
-    heroCard.style.transform = 'translateY(10px)';
+    heroCard.style.transform = 'translateX(-40px)';
     clearTimeout(heroTimer);
     heroTimer = setTimeout(() => {
       applyHeroContent(autoScrollData, autoScrollAccent, autoScrollItems[autoScrollIndex]);
-      heroCard.style.opacity   = '1';
-      heroCard.style.transform = 'translateY(0)';
-      scheduleHeroScroll();
+      heroCard.style.transition = 'none';
+      heroCard.style.transform  = 'translateX(60px)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        heroCard.style.transition = '';
+        heroCard.style.opacity    = '1';
+        heroCard.style.transform  = 'translateX(0)';
+        scheduleHeroScroll();
+      }));
     }, 140);
   }, delay);
 }
@@ -314,13 +291,18 @@ function focusTile(data, animate) {
   }
 
   heroCard.style.opacity   = '0';
-  heroCard.style.transform = 'translateY(10px)';
+  heroCard.style.transform = 'translateX(-40px)';
   clearTimeout(heroTimer);
   heroTimer = setTimeout(() => {
     applyHeroContent(data, accent, item);
-    heroCard.style.opacity   = '1';
-    heroCard.style.transform = 'translateY(0)';
-    scheduleHeroScroll();
+    heroCard.style.transition = 'none';
+    heroCard.style.transform  = 'translateX(60px)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      heroCard.style.transition = '';
+      heroCard.style.opacity    = '1';
+      heroCard.style.transform  = 'translateX(0)';
+      scheduleHeroScroll();
+    }));
   }, 140);
 }
 
@@ -334,11 +316,16 @@ function focusGlobal(animate) {
   if (!animate) { applyIdleHero(); return; }
 
   heroCard.style.opacity   = '0';
-  heroCard.style.transform = 'translateY(10px)';
+  heroCard.style.transform = 'translateX(-40px)';
   heroTimer = setTimeout(() => {
     applyIdleHero();
-    heroCard.style.opacity   = '1';
-    heroCard.style.transform = 'translateY(0)';
+    heroCard.style.transition = 'none';
+    heroCard.style.transform  = 'translateX(60px)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      heroCard.style.transition = '';
+      heroCard.style.opacity    = '1';
+      heroCard.style.transform  = 'translateX(0)';
+    }));
   }, 140);
 }
 
@@ -439,6 +426,18 @@ function showHeroInitial(name, accent) {
   heroInitial.style.color      = accent;
   heroInitial.style.border     = `2px solid ${toRgba(accent, 0.35)}`;
 }
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
+
+(function startClock() {
+  const el = document.getElementById('clock-time');
+  if (!el) return;
+  function tick() {
+    el.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  tick();
+  setInterval(tick, 1000);
+}());
 
 // ── Colour helper — #hex or rgb() → rgba(r,g,b,a) ────────────────────────────
 
