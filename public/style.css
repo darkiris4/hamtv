@@ -90,10 +90,10 @@ body {
 #hero {
   position: relative;
   flex-shrink: 0;
-  height: 58vh;
-  min-height: 520px;
-  max-height: 760px;
-  z-index: 1;
+  height: 75vh;
+  min-height: 580px;
+  max-height: 900px;
+  z-index: 10;
 
   overflow: hidden;
   display: flex;
@@ -137,7 +137,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
-  padding: 22px 48px 32px;
+  padding: 22px 48px 130px;
 }
 
 
@@ -266,18 +266,49 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* ── Content wrapper + glass tray ─────────────────────────────────────────── */
+
+/* Flex child that replaces the old #grid as the body's stretching child.
+   overflow: visible (default) lets the glass tray bleed upward into the hero. */
+#content {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Glass shelf that visually overlaps the hero bottom and frames the first tile row. */
+#tile-shelf-glass {
+  position: absolute;
+  top: -100px;
+  left: 28px;
+  right: 28px;
+  height: 380px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* ── Tile grid ─────────────────────────────────────────────────────────────── */
 
 .tile-grid {
   position: relative;
   z-index: 1;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, 200px);
   gap: 22px;
   justify-content: center;
-  padding: 28px 28px 80px;
+  padding: 128px 28px 80px;
   max-width: 1440px;
   margin: 0 auto;
   width: 100%;
@@ -382,9 +413,10 @@ body {
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 600px) {
-  #hero-body { padding: 16px 20px 24px; }
+  #hero-body { padding: 16px 20px 100px; }
   #hero-name { font-size: 24px; }
   #hero-tagline { font-size: 12px; -webkit-line-clamp: 2; line-clamp: 2; }
   #hero-logo, #hero-initial, #hero-logo-wrap { width: 60px; height: 60px; }
-  .tile-grid { gap: 14px; padding: 20px 16px 60px; }
+  #tile-shelf-glass { left: 16px; right: 16px; }
+  .tile-grid { gap: 14px; padding: 108px 16px 60px; }
 }

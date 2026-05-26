@@ -59,8 +59,12 @@
 
   </header>
 
-  <!-- Tile grid -->
-  <main id="grid" class="tile-grid"></main>
+  <!-- Content wrapper: positions glass tray + scrolling tile grid -->
+  <div id="content">
+    <!-- Glass tray overlaps the hero bottom; first tile row floats inside it -->
+    <div id="tile-shelf-glass" aria-hidden="true"></div>
+    <main id="grid" class="tile-grid"></main>
+  </div>
 
   <script src="liquid-glass.js"></script>
   <script src="app.js"></script>
