@@ -60,11 +60,21 @@ function setCachedHero(key, data) {
   const remaining  = document.createElement('div');
   remaining.className = 'tile-remaining';
 
-  const hero = document.getElementById('hero');
-  const allTileEls = [...tiles.map(buildTile), buildSettingsTile()];
-  const n = tilesPerRow(hero);
-  allTileEls.slice(0, n).forEach(el => glassRow.appendChild(el));
-  allTileEls.slice(n).forEach(el => remaining.appendChild(el));
+  const hero        = document.getElementById('hero');
+  const serviceTileEls = tiles.map(buildTile);
+  const settingsEl     = buildSettingsTile();
+
+  const hasTraySelection = tiles.some(t => t.inTray);
+  if (hasTraySelection) {
+    serviceTileEls.forEach((el, i) => {
+      (tiles[i].inTray ? glassRow : remaining).appendChild(el);
+    });
+  } else {
+    const n = tilesPerRow(hero);
+    serviceTileEls.slice(0, n).forEach(el => glassRow.appendChild(el));
+    serviceTileEls.slice(n).forEach(el => remaining.appendChild(el));
+  }
+  remaining.appendChild(settingsEl);
 
   hero.appendChild(glassRow);
   if (remaining.children.length) grid.appendChild(remaining);

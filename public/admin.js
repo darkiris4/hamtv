@@ -7,7 +7,7 @@ let tiles = [];
 document.addEventListener('DOMContentLoaded', loadConfig);
 
 document.getElementById('add-btn').addEventListener('click', () => {
-  tiles.push({ name: 'New Service', url: 'https://', logo: '', color: '#ffffff', newTab: false, tmdb_provider_id: null });
+  tiles.push({ name: 'New Service', url: 'https://', logo: '', color: '#ffffff', newTab: false, inTray: false, tmdb_provider_id: null });
   renderList();
   document.querySelectorAll('.tile-row').item(tiles.length - 1)
     ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -44,6 +44,14 @@ function renderList() {
   }
   empty.hidden = true;
   tiles.forEach((tile, i) => list.appendChild(buildRow(tile, i)));
+  syncTrayCheckboxes();
+}
+
+function syncTrayCheckboxes() {
+  const count = tiles.filter(t => t.inTray).length;
+  document.querySelectorAll('.tray-check').forEach(cb => {
+    cb.disabled = !cb.checked && count >= 6;
+  });
 }
 
 // ── Row builder ───────────────────────────────────────────────────────────────
@@ -89,16 +97,30 @@ function buildRow(tile, index) {
   tmdbLabel.appendChild(tmdbInput);
   fields.appendChild(tmdbLabel);
 
-  // New-tab checkbox spans all columns
-  const checkLabel     = document.createElement('label');
-  checkLabel.className = 'field-newtab';
-  const checkInput     = document.createElement('input');
-  checkInput.type      = 'checkbox';
-  checkInput.checked   = !!tile.newTab;
-  checkInput.addEventListener('change', e => (tiles[index].newTab = e.target.checked));
-  checkLabel.appendChild(checkInput);
-  checkLabel.appendChild(document.createTextNode('Open in new tab'));
-  fields.appendChild(checkLabel);
+  // Checkboxes row — new-tab + in-tray, both span all columns
+  const newTabLabel     = document.createElement('label');
+  newTabLabel.className = 'field-newtab';
+  const newTabInput     = document.createElement('input');
+  newTabInput.type      = 'checkbox';
+  newTabInput.checked   = !!tile.newTab;
+  newTabInput.addEventListener('change', e => (tiles[index].newTab = e.target.checked));
+  newTabLabel.appendChild(newTabInput);
+  newTabLabel.appendChild(document.createTextNode('Open in new tab'));
+  fields.appendChild(newTabLabel);
+
+  const trayLabel     = document.createElement('label');
+  trayLabel.className = 'field-newtab';
+  const trayInput     = document.createElement('input');
+  trayInput.type      = 'checkbox';
+  trayInput.className = 'tray-check';
+  trayInput.checked   = !!tile.inTray;
+  trayInput.addEventListener('change', e => {
+    tiles[index].inTray = e.target.checked;
+    syncTrayCheckboxes();
+  });
+  trayLabel.appendChild(trayInput);
+  trayLabel.appendChild(document.createTextNode('Show in glass tray (max 6)'));
+  fields.appendChild(trayLabel);
 
   row.appendChild(fields);
 
