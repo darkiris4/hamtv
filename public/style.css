@@ -137,7 +137,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
-  padding: 22px 48px 130px;
+  padding: 22px 48px 166px;
 }
 
 
@@ -273,8 +273,7 @@ body {
   min-height: 0;
   position: relative;
   z-index: 20;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
 }
 
 /* ── Tile grid (flex column — glass row first, remaining rows below) ────────── */
@@ -282,9 +281,6 @@ body {
 .tile-grid {
   position: relative;
   z-index: 1;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -292,16 +288,18 @@ body {
   margin: 0 auto;
 }
 
-/* Glass tray — first row only. Scrolls with the grid naturally.
-   margin-top: -100px bleeds upward into the hero backdrop.
-   padding-top: 124px = 100px bleed + 24px internal top padding. */
+/* Glass tray — first row only, anchored to the bottom of #hero. */
 .tile-row-glass {
+  position: absolute;
+  bottom: 0;
+  left: 28px;
+  right: 28px;
+  z-index: 4;
   display: grid;
   grid-template-columns: repeat(auto-fill, 200px);
   gap: 22px;
   justify-content: center;
-  padding: 124px 28px 24px;
-  margin-top: -100px;
+  padding: 18px 0;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
@@ -417,10 +415,10 @@ body {
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 600px) {
-  #hero-body { padding: 16px 20px 100px; }
+  #hero-body { padding: 16px 20px 152px; }
   #hero-name { font-size: 24px; }
   #hero-tagline { font-size: 12px; -webkit-line-clamp: 2; line-clamp: 2; }
   #hero-logo, #hero-initial, #hero-logo-wrap { width: 60px; height: 60px; }
-  .tile-row-glass { padding: 108px 16px 20px; margin-top: -88px; gap: 14px; }
+  .tile-row-glass { left: 16px; right: 16px; padding: 14px 0; gap: 14px; }
   .tile-remaining { gap: 14px; padding: 16px 16px 60px; }
 }

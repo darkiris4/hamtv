@@ -60,12 +60,13 @@ function setCachedHero(key, data) {
   const remaining  = document.createElement('div');
   remaining.className = 'tile-remaining';
 
+  const hero = document.getElementById('hero');
   const allTileEls = [...tiles.map(buildTile), buildSettingsTile()];
-  const n = tilesPerRow(grid);
+  const n = tilesPerRow(hero);
   allTileEls.slice(0, n).forEach(el => glassRow.appendChild(el));
   allTileEls.slice(n).forEach(el => remaining.appendChild(el));
 
-  grid.appendChild(glassRow);
+  hero.appendChild(glassRow);
   if (remaining.children.length) grid.appendChild(remaining);
 
   // Initial state — show project logo (no service hovered yet)
