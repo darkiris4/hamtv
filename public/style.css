@@ -135,7 +135,7 @@ body {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: 100%;
   padding: 22px 48px 32px;
 }
