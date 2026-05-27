@@ -2,9 +2,9 @@
   {
     "name": "Apple TV",
     "url": "https://tv.apple.com",
-    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/apple-tv-plus-light.svg",
-    "color": "#1C1C1E",
-    "newTab": false,
+    "logo": "/icons/appletv.png",
+    "color": "#000000",
+    "newTab": true,
     "tmdb_provider_id": 350,
     "inTray": true
   },
@@ -13,76 +13,77 @@
     "url": "https://roadtrip.hamlan.io",
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg",
     "color": "#000000",
-    "newTab": false,
+    "newTab": true,
     "tmdb_provider_id": null,
-    "inTray": true
+    "inTray": true,
+    "logoFit": "fill-v",
+    "logoPadding": 20
   },
   {
     "name": "Hulu",
     "url": "https://www.hulu.com",
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/hulu.svg",
     "color": "#000000",
-    "newTab": false,
+    "newTab": true,
     "tmdb_provider_id": 15,
-    "inTray": true
+    "inTray": true,
+    "logoPadding": 20
   },
   {
     "name": "Disney+",
     "url": "https://www.disneyplus.com",
-    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/disney-plus.svg",
-    "color": "#0063E5",
-    "newTab": false,
+    "logo": "/icons/disneyplus.jpg",
+    "color": "#000000",
+    "newTab": true,
     "tmdb_provider_id": 337,
-    "inTray": true
+    "inTray": true,
+    "logoFit": "fill-h"
   },
   {
     "name": "Peacock",
     "url": "https://www.peacocktv.com",
     "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/peacock-light.svg",
     "color": "#F5A623",
-    "newTab": false,
+    "newTab": true,
     "tmdb_provider_id": 386,
-    "inTray": true
+    "inTray": true,
+    "logoPadding": 20
   },
   {
     "name": "Paramount+",
     "url": "https://www.paramountplus.com",
     "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/refs/heads/main/svg/paramount-plus-dark.svg",
     "color": "#0064FF",
-    "newTab": false,
+    "newTab": true,
     "tmdb_provider_id": 531,
-    "inTray": true
+    "inTray": true,
+    "logoPadding": 19
   },
   {
     "name": "Prime Video",
     "url": "https://www.primevideo.com",
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/prime-video.svg",
     "color": "#000000",
-    "newTab": false,
-    "tmdb_provider_id": 9
+    "newTab": true,
+    "tmdb_provider_id": 9,
+    "logoPadding": 20
   },
   {
     "name": "YouTube",
     "url": "https://www.youtube.com",
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/youtube.svg",
     "color": "#ffffff",
-    "newTab": false,
-    "tmdb_provider_id": 192
-  },
-  {
-    "name": "Apple Fitness+",
-    "url": "https://fitness.apple.com",
-    "logo": "/icons/fitness.png",
-    "color": "#000000",
-    "newTab": false,
-    "tmdb_provider_id": null
+    "newTab": true,
+    "tmdb_provider_id": 192,
+    "logoPadding": 20
   },
   {
     "name": "Apple Music",
     "url": "https://music.apple.com/us/new",
     "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/apple-music.svg",
     "color": "#FC3C44",
-    "newTab": false,
-    "tmdb_provider_id": null
+    "newTab": true,
+    "tmdb_provider_id": null,
+    "logoPadding": 20
   }
 ]
