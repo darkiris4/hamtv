@@ -15,7 +15,12 @@ let heroAutoTimer    = null;  // setTimeout handle for 5-10s cycle
 // ── Hero content cache (sessionStorage, per-tab) ──────────────────────────────
 
 function getCachedHero(key) {
-  try { return JSON.parse(sessionStorage.getItem(`hamtv_hero_${key}`)) ?? null; } catch { return null; }
+  try {
+    const items = JSON.parse(sessionStorage.getItem(`hamtv_hero_${key}`)) ?? null;
+    // Discard stale cache if items are missing id (pre-trailer format)
+    if (Array.isArray(items) && items.length > 0 && !items[0].id) return null;
+    return items;
+  } catch { return null; }
 }
 function setCachedHero(key, data) {
   try { sessionStorage.setItem(`hamtv_hero_${key}`, JSON.stringify(data)); } catch {}

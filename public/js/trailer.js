@@ -94,8 +94,8 @@
     wrap.appendChild(iframe);
     requestAnimationFrame(() => wrap.classList.add('active'));
 
-    // Safety valve: if the iframe fails silently, clean up after 4s
-    safetyTimer = setTimeout(_stopTrailer, 4000);
+    // Safety valve: if the iframe fails silently, clean up after 8s
+    safetyTimer = setTimeout(_stopTrailer, 8000);
   }
 
   // ── Stop ────────────────────────────────────────────────────────────────────

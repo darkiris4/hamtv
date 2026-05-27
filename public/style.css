@@ -349,7 +349,7 @@ body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 4;
+  z-index: 6;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 200px;
