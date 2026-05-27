@@ -198,6 +198,11 @@ function attachTileInteractions(a, accent, tileData) {
 
   // Helper: get the top TMDB content item for this tile (for trailer fetching)
   function _topItem() {
+    // Prefer the item currently shown in the hero (matches what the backdrop shows)
+    if (autoScrollData === tileData && autoScrollItems.length > 0) {
+      const cur = autoScrollItems[autoScrollIndex];
+      if (cur?.id && cur?.mediaType) return cur;
+    }
     return (heroItemsFor(tileData) || []).find(i => i?.id && i?.mediaType) || null;
   }
 
@@ -358,9 +363,14 @@ function scheduleHeroScroll() {
   const delay = 5000 + Math.random() * 5000;
   heroAutoTimer = setTimeout(() => {
     autoScrollIndex = (autoScrollIndex + 1) % autoScrollItems.length;
+    const newItem = autoScrollItems[autoScrollIndex];
     heroAnimate(() => {
-      applyHeroContent(autoScrollData, autoScrollAccent, autoScrollItems[autoScrollIndex]);
+      applyHeroContent(autoScrollData, autoScrollAccent, newItem);
     });
+    // Keep trailer in sync with whatever backdrop is now showing
+    if (newItem?.id && newItem?.mediaType) {
+      window.onTrailerAdvance?.(newItem.id, newItem.mediaType);
+    }
     scheduleHeroScroll();
   }, delay);
 }
