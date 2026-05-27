@@ -235,6 +235,7 @@ function attachTileInteractions(a, accent, tileData) {
     a.style.borderColor = 'rgba(255,255,255,0.75)';
     a.style.boxShadow   =
       `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
+    if (autoScrollData === tileData) return; // same tile re-enter — don't reset cycling or trailer
     focusTile(tileData, true);
     const t = _topItem(); if (t) window.onTileFocus?.(t.id, t.mediaType);
   });
@@ -292,6 +293,8 @@ const heroDomain       = document.getElementById('hero-domain');
 const heroBackdrop     = document.getElementById('hero-backdrop');
 const heroBackdropPrev = document.getElementById('hero-backdrop-prev');
 const bgGlow           = document.getElementById('bg-glow');
+const heroPrev         = document.getElementById('hero-prev');
+const heroNext         = document.getElementById('hero-next');
 
 let heroTimer;
 
@@ -375,9 +378,30 @@ function scheduleHeroScroll() {
     heroAnimate(() => {
       applyHeroContent(autoScrollData, autoScrollAccent, newItem);
     });
+    // If a dwell timer was pending, reset it for the new item (ensures 5s title visibility)
+    if (newItem?.id && newItem?.mediaType) {
+      window.onHeroItemChange?.(newItem.id, newItem.mediaType);
+    }
     scheduleHeroScroll();
   }, delay);
 }
+
+// ── Hero nav (prev/next title buttons) ───────────────────────────────────────
+
+function heroNavStep(direction) {
+  if (!autoScrollData || autoScrollItems.length < 2) return;
+  window.onTileBlur?.();          // stop trailer + cancel pending dwell
+  stopHeroAutoScroll();
+  autoScrollIndex = (autoScrollIndex + direction + autoScrollItems.length) % autoScrollItems.length;
+  const item = autoScrollItems[autoScrollIndex];
+  heroAnimate(() => applyHeroContent(autoScrollData, autoScrollAccent, item));
+  // Start fresh 5s dwell so trailer follows after the title image shows
+  if (item?.id && item?.mediaType) window.onTileFocus?.(item.id, item.mediaType);
+  scheduleHeroScroll();
+}
+
+heroPrev?.addEventListener('click', () => heroNavStep(-1));
+heroNext?.addEventListener('click', () => heroNavStep(+1));
 
 // ── Hero focus — tile ─────────────────────────────────────────────────────────
 
@@ -402,12 +426,18 @@ function focusTile(data, animate) {
     heroAnimateInitial(applyFn);
   }
   scheduleHeroScroll();
+  const hasItems = autoScrollItems.length > 1;
+  if (heroPrev) heroPrev.hidden = !hasItems;
+  if (heroNext) heroNext.hidden = !hasItems;
 }
 
 // ── Hero focus — idle (no service hovered) ────────────────────────────────────
 
 function focusGlobal(animate) {
   stopHeroAutoScroll();
+  autoScrollData = null;
+  if (heroPrev) heroPrev.hidden = true;
+  if (heroNext) heroNext.hidden = true;
   bgGlow.style.backgroundColor = '#1c1c1e';
 
   if (animate) {

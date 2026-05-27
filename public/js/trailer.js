@@ -68,6 +68,18 @@
     _stopTrailer();
   };
 
+  // Called by auto-scroll when the backdrop advances to a new item.
+  // If a dwell timer is pending (trailer hasn't started yet), reset it so
+  // the new title image always shows for the full dwell period first.
+  window.onHeroItemChange = function (tmdbContentId, mediaType) {
+    if (!dwellTimer) return;   // no pending dwell — nothing to reset
+    clearTimeout(dwellTimer);
+    reqSeq++;
+    _prefetch(tmdbContentId, mediaType);
+    const seq = reqSeq;
+    dwellTimer = setTimeout(() => _playTrailer(tmdbContentId, mediaType, seq), 5000);
+  };
+
   // ── Prefetch ────────────────────────────────────────────────────────────────
 
   async function _prefetch(id, mediaType) {
