@@ -191,6 +191,11 @@ function buildSettingsTile() {
 function attachTileInteractions(a, accent, tileData) {
   let isFocused = false;
 
+  // Helper: get the top TMDB content item for this tile (for trailer fetching)
+  function _topItem() {
+    return (heroItemsFor(tileData) || []).find(i => i?.id && i?.mediaType) || null;
+  }
+
   // Focus → update hero (keyboard nav or click)
   a.addEventListener('focus', () => {
     isFocused = true;
@@ -199,6 +204,7 @@ function attachTileInteractions(a, accent, tileData) {
     a.style.boxShadow   =
       `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
     focusTile(tileData, true);
+    const t = _topItem(); if (t) window.onTileFocus?.(t.id, t.mediaType);
   });
 
   a.addEventListener('blur', () => {
@@ -210,6 +216,7 @@ function attachTileInteractions(a, accent, tileData) {
     a.style.borderColor = 'rgba(255,255,255,0.08)';
     a.style.boxShadow   = '';
     focusGlobal(true);
+    window.onTileBlur?.();
   });
 
   // Hover → tile visual effects + hero update
@@ -219,6 +226,7 @@ function attachTileInteractions(a, accent, tileData) {
     a.style.boxShadow   =
       `0 0 0 1px rgba(255,255,255,0.5), 0 12px 44px ${toRgba(accent, 0.55)}`;
     focusTile(tileData, true);
+    const t = _topItem(); if (t) window.onTileFocus?.(t.id, t.mediaType);
   });
 
   a.addEventListener('mousemove', e => {
@@ -243,6 +251,7 @@ function attachTileInteractions(a, accent, tileData) {
       a.style.borderColor = 'rgba(255,255,255,0.08)';
       a.style.boxShadow   = '';
     }
+    window.onTileBlur?.();
   });
 }
 

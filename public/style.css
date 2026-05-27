@@ -132,21 +132,57 @@ body {
   z-index: 0;
 }
 
+/* ── Hero trailer ──────────────────────────────────────────────────────────── */
+
+#hero-trailer-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+#hero-trailer-wrap.active {
+  opacity: 1;
+}
+
+#hero-trailer-wrap iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110%;
+  height: 110%;
+  border: none;
+  pointer-events: none;
+}
+
+#hero-trailer-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, #111 0%, transparent 28%, transparent 60%, #111 100%),
+    linear-gradient(to right,  #111 0%, transparent 18%, transparent 82%, #111 100%);
+}
+
 /* Vignette: bottom and left edges fade to page colour */
 #hero-vignette {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   background:
     linear-gradient(to top,   #111 0%,  transparent 38%),
     linear-gradient(to right, #111 0%,  transparent 28%);
   pointer-events: none;
 }
 
-/* Content sits above the backdrop layers */
+/* Content sits above all backdrop/trailer layers */
 #hero-body {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

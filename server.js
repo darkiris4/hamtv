@@ -36,7 +36,7 @@ function normalizeItem(r, type) {
   const tagline  = (r.overview || '').slice(0, 180).trim();
   const backdrop = r.backdrop_path ? `${TMDB_IMG}${r.backdrop_path}` : null;
   if (!backdrop || !title) return null;
-  return { title, tagline, backdrop, mediaType: type || r.media_type || 'movie' };
+  return { id: r.id, title, tagline, backdrop, mediaType: type || r.media_type || 'movie' };
 }
 
 async function fetchTrending() {
@@ -148,6 +148,20 @@ app.get('/api/hero/:providerId', (req, res) => {
     ? (hero.providers[id] ?? hero.global ?? [])
     : (hero.global ?? []);
   res.json(items);
+});
+
+// GET /api/videos/:mediaType/:id — proxy TMDB videos for trailer fetch
+app.get('/api/videos/:mediaType/:id', async (req, res) => {
+  if (!TMDB_KEY) return res.json([]);
+  const { mediaType, id } = req.params;
+  try {
+    const r = await tmdbFetch(`/${mediaType}/${id}/videos`, { language: 'en-US' });
+    if (!r?.ok) return res.json([]);
+    const data = await r.json();
+    res.json(data.results || []);
+  } catch {
+    res.json([]);
+  }
 });
 
 app.get('/admin', (_req, res) =>
