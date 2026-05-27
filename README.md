@@ -153,31 +153,6 @@ tv.example.com {
 
 ---
 
-## Project Structure
-
-```
-hamtv/
-├── server.js              # Express server — API routes + TMDB cache
-├── config.json            # Tile definitions
-├── package.json
-├── .env.example
-├── Dockerfile
-├── docker-compose.yml
-└── public/
-    ├── index.html         # Launcher page
-    ├── style.css
-    ├── app.js             # Tile grid, hero logic, auto-scroll, nav buttons
-    ├── liquid-glass.js    # Frosted-glass backdrop-filter effect
-    ├── admin.html
-    ├── admin.css
-    ├── admin.js
-    ├── icons/             # Local logo files
-    └── js/
-        └── trailer.js     # Trailer autoplay, mute toggle, dwell timer
-```
-
----
-
 ## API
 
 | Method | Path                      | Description |
