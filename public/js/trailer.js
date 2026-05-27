@@ -1,6 +1,5 @@
 // trailer.js — hero trailer autoplay for focused service tiles
-// Exposes globals: onTileFocus(tmdbContentId, mediaType), onTileBlur(),
-//                  onTrailerAdvance(tmdbContentId, mediaType)
+// Exposes globals: onTileFocus(tmdbContentId, mediaType), onTileBlur()
 
 (function () {
   const wrap    = document.getElementById('hero-trailer-wrap');
@@ -10,6 +9,7 @@
 
   let dwellTimer    = null;
   let safetyTimer   = null;
+  let maxPlayTimer  = null;   // ultimate cleanup if postMessage never fires
   let pollTimer     = null;
   let reqSeq        = 0;
   let currentIframe = null;
@@ -33,16 +33,20 @@
   });
 
   // YouTube sends onStateChange via postMessage when enablejsapi=1.
-  // State 1 = playing, 3 = buffering. Either means the iframe is working —
-  // clear the safety timer so a healthy trailer isn't killed mid-play.
+  //   State 1 = playing, 3 = buffering → clear startup safety timer
+  //   State 0 = ended → stop trailer so auto-scroll can resume
   window.addEventListener('message', e => {
     if (!currentIframe || e.source !== currentIframe.contentWindow) return;
     try {
       const data  = JSON.parse(e.data);
       const state = typeof data.info === 'number' ? data.info : (data.info?.playerState ?? -99);
-      if (data.event === 'onStateChange' && (state === 1 || state === 3)) {
-        clearTimeout(safetyTimer);
-        safetyTimer = null;
+      if (data.event === 'onStateChange') {
+        if (state === 1 || state === 3) {
+          clearTimeout(safetyTimer);
+          safetyTimer = null;
+        } else if (state === 0) {
+          _stopTrailer();
+        }
       }
     } catch {}
   });
@@ -62,17 +66,6 @@
     dwellTimer = null;
     reqSeq++;
     _stopTrailer();
-  };
-
-  // Called by auto-scroll when the backdrop advances to a new item while a
-  // trailer is already playing. Transitions immediately (no 2s dwell).
-  window.onTrailerAdvance = function (tmdbContentId, mediaType) {
-    if (!wrap.classList.contains('active')) return; // no trailer playing — ignore
-    reqSeq++;
-    _prefetch(tmdbContentId, mediaType);
-    const seq = reqSeq;
-    clearTimeout(dwellTimer);
-    dwellTimer = setTimeout(() => _playTrailer(tmdbContentId, mediaType, seq), 500);
   };
 
   // ── Prefetch ────────────────────────────────────────────────────────────────
@@ -147,9 +140,12 @@
 
     if (muteBtn) muteBtn.hidden = false;
 
-    // Safety valve: if the iframe fails silently (no onStateChange within 20s), clean up.
-    // Cleared early once YouTube confirms playback via postMessage.
-    safetyTimer = setTimeout(_stopTrailer, 20000);
+    // Startup safety: if playback never begins (silent failure), clean up after 30s.
+    // Cleared once YouTube confirms buffering/playing via postMessage.
+    safetyTimer  = setTimeout(_stopTrailer, 30000);
+    // Ultimate fallback: ensure cleanup after 5 min even if postMessage never fires
+    // (keeps auto-scroll from being paused indefinitely).
+    maxPlayTimer = setTimeout(_stopTrailer, 5 * 60 * 1000);
   }
 
   // ── Stop ────────────────────────────────────────────────────────────────────
@@ -157,8 +153,10 @@
   function _stopTrailer() {
     clearTimeout(pollTimer);
     clearTimeout(safetyTimer);
+    clearTimeout(maxPlayTimer);
     pollTimer     = null;
     safetyTimer   = null;
+    maxPlayTimer  = null;
     currentIframe = null;
 
     if (muteBtn) muteBtn.hidden = true;

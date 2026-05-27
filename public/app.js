@@ -364,16 +364,17 @@ function scheduleHeroScroll() {
   if (autoScrollItems.length < 2) return;
 
   const delay = 5000 + Math.random() * 5000;
-  heroAutoTimer = setTimeout(() => {
+  heroAutoTimer = setTimeout(function advance() {
+    // Pause while a trailer is playing — re-check in 3s rather than interrupting
+    if (document.getElementById('hero-trailer-wrap')?.classList.contains('active')) {
+      heroAutoTimer = setTimeout(advance, 3000);
+      return;
+    }
     autoScrollIndex = (autoScrollIndex + 1) % autoScrollItems.length;
     const newItem = autoScrollItems[autoScrollIndex];
     heroAnimate(() => {
       applyHeroContent(autoScrollData, autoScrollAccent, newItem);
     });
-    // Keep trailer in sync with whatever backdrop is now showing
-    if (newItem?.id && newItem?.mediaType) {
-      window.onTrailerAdvance?.(newItem.id, newItem.mediaType);
-    }
     scheduleHeroScroll();
   }, delay);
 }
