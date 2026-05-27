@@ -261,7 +261,10 @@ function attachTileInteractions(a, accent, tileData) {
       a.style.borderColor = 'rgba(255,255,255,0.08)';
       a.style.boxShadow   = '';
     }
-    window.onTileBlur?.();
+    // Trailer is NOT stopped here — it latches on hover so the user can
+    // move the mouse to the mute button without killing the trailer.
+    // The trailer stops when a different tile is hovered (onTileFocus
+    // replaces it) or keyboard focus leaves (blur → onTileBlur).
   });
 }
 
