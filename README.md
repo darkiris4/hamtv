@@ -1,6 +1,22 @@
 # hamtv
 
-A self-hosted, Apple TV-style launcher for your streaming services. Single-page web app with a TMDB-powered hero backdrop, served by a tiny Node/Express server — no build step, no framework.
+A self-hosted, Apple TV-style launcher for your streaming services. Single-page web app with a TMDB-powered hero section, muted trailer autoplay, and liquid-glass UI — served by a tiny Node/Express server with no build step and no framework.
+
+---
+
+## Features
+
+- **Tile grid** — Responsive grid of clickable service tiles with 3D perspective tilt, specular shine, and per-tile accent glow on hover
+- **Glass tray** — First row of tiles floats in a frosted-glass panel anchored to the bottom of the hero
+- **TMDB hero** — Full-bleed backdrop cycling through popular titles on the focused service; fades between items every 5–10 seconds
+- **Trailer autoplay** — After 5 seconds on a tile, a muted YouTube trailer plays in the hero for the title currently on screen
+  - Mute/unmute toggle (glass pill, bottom-right of hero) without restarting the video
+  - Prev/next title navigation (glass pills, bottom-left of hero) to manually cycle through the service's catalogue
+  - Content cycling pauses while a trailer is playing and resumes when it ends
+  - Each title image is shown for at least 5 seconds before its trailer starts
+- **Ambient glow** — Large blurred background blob that slowly shifts color to match the focused tile
+- **Clock pill** — Live clock in the top-right corner of the hero
+- **Admin panel** — Add, edit, delete, and drag-reorder tiles; per-tile logo padding and fill controls
 
 ---
 
@@ -8,23 +24,21 @@ A self-hosted, Apple TV-style launcher for your streaming services. Single-page 
 
 ### Docker (recommended)
 
-Create `config.json` in your deploy directory first, then pull and run:
-
 ```bash
 echo '[]' > config.json
 docker compose up -d
 ```
 
-Open **http://localhost:3000**. Tiles are configured via the admin panel at **/admin**.
+Open **http://localhost:3000**. Configure tiles at **/admin**.
 
-> **Note:** `config.json` must exist as a file before `docker compose up` — if Docker creates it as a directory you'll get an `EISDIR` error. Run `echo '[]' > config.json` to fix it.
+> **Note:** `config.json` must exist as a file before `docker compose up`. If Docker creates it as a directory you'll get an `EISDIR` error — `echo '[]' > config.json` fixes it.
 
 ### Bare Node.js
 
 ```bash
 git clone https://github.com/darkiris4/hamtv
 cd hamtv
-cp .env.example .env   # add your TMDB_API_KEY
+cp .env.example .env   # add TMDB_API_KEY
 npm install
 node server.js
 ```
@@ -33,30 +47,42 @@ node server.js
 
 ## Environment Variables
 
-Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-| Variable        | Default | Description                              |
-|-----------------|---------|------------------------------------------|
-| `PORT`          | `3000`  | Port the server listens on               |
-| `TMDB_API_KEY`  | —       | TMDB v3 API key or v4 JWT read token. Enables the hero backdrop feature. Get one free at themoviedb.org |
+| Variable        | Default | Description |
+|-----------------|---------|-------------|
+| `PORT`          | `3000`  | Port the server listens on |
+| `TMDB_API_KEY`  | —       | TMDB v3 key (32-char hex) or v4 JWT read token. Enables the hero backdrop and trailer features. Get one free at [themoviedb.org](https://www.themoviedb.org/settings/api) |
 
 ---
 
-## TMDB Hero
+## TMDB Hero & Trailers
 
-When `TMDB_API_KEY` is set, the hero section at the top of the launcher shows a full-bleed backdrop image from the focused service's content catalogue. On focus, it fetches popular titles available on that provider; if a provider has no TMDB ID configured, the hero falls back to the tile's static branding instead.
+When `TMDB_API_KEY` is set:
 
-To wire a tile to a TMDB provider, set `tmdb_provider_id` in `config.json` (e.g. Netflix = `8`, Disney+ = `337`, Hulu = `15`).
+1. The hero section shows a full-bleed backdrop cycling through popular titles available on the focused service.
+2. Hovering a tile for 5 seconds triggers muted autoplay of the YouTube trailer for whichever title is currently on screen.
+3. The prev/next buttons let you manually browse titles; each new title shows for 5 seconds before its trailer starts.
+4. If a tile has no `tmdb_provider_id`, the hero falls back to the tile's own logo and branding.
+
+To wire a tile to a TMDB provider, find the provider's numeric ID on TMDB and set `tmdb_provider_id` in `config.json`. Common IDs:
+
+| Service     | ID  |
+|-------------|-----|
+| Netflix     | 8   |
+| Apple TV+   | 350 |
+| Disney+     | 337 |
+| Hulu        | 15  |
+| Amazon      | 9   |
+| Max         | 1899|
+| Paramount+  | 531 |
+| Peacock     | 386 |
+
+Hero content is prefetched at startup and refreshed every 6 hours.
 
 ---
 
 ## Configuration
 
-Tiles are defined in `config.json` — a JSON array. Edit it directly or use the admin panel.
+Tiles are stored in `config.json` — a JSON array. Edit directly or use the admin panel at `/admin`.
 
 ```json
 [
@@ -65,20 +91,30 @@ Tiles are defined in `config.json` — a JSON array. Edit it directly or use the
     "url":              "https://www.netflix.com",
     "logo":             "/icons/netflix.png",
     "color":            "#E50914",
-    "newTab":           false,
-    "tmdb_provider_id": 8
+    "newTab":           true,
+    "tmdb_provider_id": 8,
+    "inTray":           true,
+    "logoFit":          "contain",
+    "logoPadding":      0
   }
 ]
 ```
 
-| Field               | Required | Description                                                        |
-|---------------------|----------|--------------------------------------------------------------------|
-| `name`              | Yes      | Display label                                                      |
-| `url`               | Yes      | URL opened when the tile is clicked                                |
-| `logo`              | No       | Image URL or local path. Falls back to a text initial.             |
-| `color`             | No       | Hex accent color for the tile glow (`#RRGGBB`)                     |
-| `newTab`            | No       | `true` to open in a new tab                                        |
-| `tmdb_provider_id`  | No       | TMDB watch provider ID — enables provider-specific hero backdrops  |
+| Field               | Required | Description |
+|---------------------|----------|-------------|
+| `name`              | Yes      | Display label and hero fallback title |
+| `url`               | Yes      | URL opened when the tile is clicked |
+| `logo`              | No       | Image URL or local path under `public/`. Falls back to a text initial. |
+| `color`             | No       | Hex accent color for tile glow and ambient background (`#RRGGBB`) |
+| `newTab`            | No       | `true` to open in a new tab |
+| `tmdb_provider_id`  | No       | TMDB watch provider ID — enables hero backdrops and trailers |
+| `inTray`            | No       | `true` to place the tile in the glass tray (first row); others go in the scrollable grid below |
+| `logoFit`           | No       | `contain` (default), `fill-v` (full height), or `fill-h` (full width) |
+| `logoPadding`       | No       | Inner padding in pixels applied to the tile logo image |
+
+### Local logo files
+
+Drop images into `public/icons/` and reference them as `/icons/filename.png`. The admin panel lets you set padding and fill direction per tile so logos that don't fit the 200×130 tile naturally can be adjusted without editing the file.
 
 ---
 
@@ -86,20 +122,22 @@ Tiles are defined in `config.json` — a JSON array. Edit it directly or use the
 
 Navigate to **http://localhost:3000/admin**.
 
-- Add, edit, delete, and reorder tiles
-- Changes are written to `config.json` immediately and reflected on next page load
+- Add, edit, and delete tiles
+- Drag to reorder
+- Set logo URL, accent color, padding, and fill direction per tile
+- Changes write to `config.json` immediately
 
 ---
 
 ## Docker Image
 
-Pre-built image is published to GHCR on every push to `main`:
+Pre-built image published to GHCR on every push to `main`:
 
 ```
 ghcr.io/darkiris4/hamtv:latest
 ```
 
-The `config.json` is bind-mounted at runtime so tile changes survive image updates.
+`config.json` is bind-mounted at runtime so tile changes survive image updates.
 
 ---
 
@@ -119,29 +157,33 @@ tv.example.com {
 
 ```
 hamtv/
-├── server.js          # Express server — API + static file serving + TMDB cache
-├── config.json        # Tile definitions (edit directly or via /admin)
+├── server.js              # Express server — API routes + TMDB cache
+├── config.json            # Tile definitions
 ├── package.json
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
 └── public/
-    ├── index.html     # Launcher page
+    ├── index.html         # Launcher page
     ├── style.css
-    ├── app.js         # Config fetch, tile grid, TMDB hero logic
+    ├── app.js             # Tile grid, hero logic, auto-scroll, nav buttons
+    ├── liquid-glass.js    # Frosted-glass backdrop-filter effect
     ├── admin.html
     ├── admin.css
-    └── admin.js
+    ├── admin.js
+    ├── icons/             # Local logo files
+    └── js/
+        └── trailer.js     # Trailer autoplay, mute toggle, dwell timer
 ```
 
 ---
 
 ## API
 
-| Method | Path                | Description                            |
-|--------|---------------------|----------------------------------------|
-| GET    | `/api/config`       | Returns current tile array             |
-| POST   | `/api/config`       | Overwrites tiles (admin auth required) |
-| GET    | `/api/hero`         | Global TMDB trending items             |
-| GET    | `/api/hero/:id`     | Provider-specific items, falls back to global |
-| POST   | `/api/admin/verify` | Verifies admin password                |
+| Method | Path                      | Description |
+|--------|---------------------------|-------------|
+| GET    | `/api/config`             | Returns current tile array |
+| POST   | `/api/config`             | Overwrites tiles with `{ tiles: [...] }` |
+| GET    | `/api/hero`               | Global TMDB trending (up to 10 items) |
+| GET    | `/api/hero/:providerId`   | Provider-specific items; falls back to global |
+| GET    | `/api/videos/:type/:id`   | TMDB video list for a title (used by trailer autoplay) |
