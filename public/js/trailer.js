@@ -58,7 +58,7 @@
     reqSeq++;
     _prefetch(tmdbContentId, mediaType);
     const seq = reqSeq;
-    dwellTimer = setTimeout(() => _playTrailer(tmdbContentId, mediaType, seq), 2000);
+    dwellTimer = setTimeout(() => _playTrailer(tmdbContentId, mediaType, seq), 5000);
   };
 
   window.onTileBlur = function () {
