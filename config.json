@@ -85,5 +85,16 @@
     "newTab": true,
     "tmdb_provider_id": null,
     "logoPadding": 20
+  },
+  {
+    "name": "RetroArch",
+    "url": "retroarch://",
+    "logo": "/icons/retroarch.png",
+    "color": "#5e5e5e",
+    "newTab": true,
+    "inTray": false,
+    "tmdb_provider_id": null,
+    "logoPadding": 0,
+    "logoFit": "contain"
   }
 ]

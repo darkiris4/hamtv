@@ -161,6 +161,10 @@ function buildTile(data) {
     a.appendChild(makeInitial(data.name));
   }
 
+  if (data.url.startsWith('retroarch://')) {
+    a.addEventListener('click', e => { e.preventDefault(); tryRetroArch(); });
+  }
+
   attachTileInteractions(a, accent, data);
   return a;
 }
@@ -615,4 +619,76 @@ function toRgba(color, alpha) {
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
   return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ── RetroArch URL scheme probe ────────────────────────────────────────────────
+
+function tryRetroArch() {
+  let resolved = false;
+
+  function resolve(launched) {
+    if (resolved) return;
+    resolved = true;
+    clearTimeout(timer);
+    window.removeEventListener('blur', onBlur);
+    document.removeEventListener('visibilitychange', onVis);
+    if (!launched) showRetroArchModal();
+  }
+
+  function onBlur() { resolve(true); }
+  function onVis()  { if (document.hidden) resolve(true); }
+
+  window.addEventListener('blur', onBlur);
+  document.addEventListener('visibilitychange', onVis);
+  const timer = setTimeout(() => resolve(false), 2000);
+
+  // Hidden iframe avoids navigating the page; silently fails if scheme unregistered
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText =
+    'position:fixed;top:-100px;left:-100px;width:1px;height:1px;opacity:0;pointer-events:none;border:none;';
+  document.body.appendChild(iframe);
+  try { iframe.src = 'retroarch://'; } catch {}
+  setTimeout(() => iframe.parentNode?.removeChild(iframe), 3000);
+}
+
+function showRetroArchModal() {
+  const modal   = document.getElementById('retroarch-modal');
+  const curlEl  = document.getElementById('retroarch-curl-cmd');
+  const badge   = document.getElementById('retroarch-copied-badge');
+  const copyBtn = document.getElementById('retroarch-copy-btn');
+  const tryBtn  = document.getElementById('retroarch-try-again-btn');
+  const bdrop   = document.getElementById('retroarch-modal-backdrop');
+
+  const cmd = `curl -fsSL ${window.location.protocol}//${window.location.host}/setup-retroarch.sh | bash`;
+  curlEl.textContent = cmd;
+
+  function flashBadge() {
+    badge.classList.add('visible');
+    setTimeout(() => badge.classList.remove('visible'), 2200);
+  }
+
+  function copyCmd() {
+    navigator.clipboard.writeText(cmd).then(flashBadge).catch(() => {
+      const range = document.createRange();
+      range.selectNode(curlEl);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    copyBtn.removeEventListener('click', copyCmd);
+    tryBtn.removeEventListener('click', doTryAgain);
+    bdrop.removeEventListener('click', closeModal);
+  }
+
+  function doTryAgain() { closeModal(); tryRetroArch(); }
+
+  copyBtn.addEventListener('click', copyCmd);
+  tryBtn.addEventListener('click', doTryAgain);
+  bdrop.addEventListener('click', closeModal);
+
+  modal.hidden = false;
+  copyCmd(); // auto-copy the moment the modal opens
 }

@@ -111,6 +111,73 @@ async function populateHeroCache() {
   console.log(`TMDB cache ready — ${hero.global?.length ?? 0} global, ${n}/${ids.length} providers`);
 }
 
+// ── RetroArch setup script / Terminal launcher ────────────────────────────────
+
+function makeSetupScript() {
+  return `#!/usr/bin/env bash
+set -euo pipefail
+
+RETROARCH_APP="/Applications/RetroArch.app"
+LAUNCHER_APP="/Applications/RetroArchLauncher.app"
+LSREG="/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister"
+
+if [ ! -d "$RETROARCH_APP" ]; then
+  echo "RetroArch is not installed."
+  echo "Download it from: https://www.retroarch.com/index.php?page=platforms"
+  exit 1
+fi
+
+if [ -d "$LAUNCHER_APP" ]; then
+  echo "RetroArchLauncher.app already exists — re-registering URL scheme..."
+  "$LSREG" -f "$LAUNCHER_APP"
+  echo "Setup complete. Return to the browser and click Try Again."
+  exit 0
+fi
+
+echo "Creating /Applications/RetroArchLauncher.app..."
+
+mkdir -p "$LAUNCHER_APP/Contents/MacOS"
+mkdir -p "$LAUNCHER_APP/Contents/Resources"
+
+cat > "$LAUNCHER_APP/Contents/MacOS/RetroArchLauncher" << 'SHELLSCRIPT'
+#!/usr/bin/env bash
+open -a RetroArch
+SHELLSCRIPT
+
+chmod +x "$LAUNCHER_APP/Contents/MacOS/RetroArchLauncher"
+
+cat > "$LAUNCHER_APP/Contents/Info.plist" << 'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleExecutable</key>
+  <string>RetroArchLauncher</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.hamtv.retroarchlauncher</string>
+  <key>CFBundleName</key>
+  <string>RetroArchLauncher</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>RetroArch URL</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>retroarch</string>
+      </array>
+    </dict>
+  </array>
+</dict>
+</plist>
+PLIST
+
+"$LSREG" -f "$LAUNCHER_APP"
+
+echo "Setup complete. Return to the browser and click Try Again."
+`;
+}
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 app.get('/api/config', (req, res) => {
@@ -162,6 +229,40 @@ app.get('/api/videos/:mediaType/:id', async (req, res) => {
   } catch {
     res.json([]);
   }
+});
+
+app.get('/setup-retroarch.sh', (_req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', 'inline; filename="setup-retroarch.sh"');
+  res.send(makeSetupScript());
+});
+
+// macOS Terminal document — opens Terminal and runs the setup script automatically.
+// The CommandString embeds the full URL so it works from any host (local or VPS).
+app.get('/setup-retroarch.terminal', (req, res) => {
+  const proto = req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http');
+  const host  = req.headers.host || `localhost:${PORT}`;
+  const url   = `${proto}://${host}/setup-retroarch.sh`;
+  const cmd   = `bash -c 'curl -fsSL ${url} | bash; echo; echo "Setup complete — return to browser and click Try Again."; read -p "Press Return to close..." _'`;
+
+  const plist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CommandString</key>
+    <string>${cmd}</string>
+    <key>RunCommandAsShell</key>
+    <false/>
+    <key>name</key>
+    <string>Basic</string>
+    <key>type</key>
+    <string>Window Settings</string>
+</dict>
+</plist>`;
+
+  res.setHeader('Content-Type', 'application/xml');
+  res.setHeader('Content-Disposition', 'attachment; filename="setup-retroarch.terminal"');
+  res.send(plist);
 });
 
 app.get('/admin', (_req, res) =>

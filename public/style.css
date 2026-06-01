@@ -547,3 +547,139 @@ body {
   .tile-row-glass { padding: 14px 16px; gap: 14px; }
   .tile-remaining { gap: 14px; padding: 16px 16px 60px; }
 }
+
+/* ── RetroArch setup modal ─────────────────────────────────────────────────── */
+
+#retroarch-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#retroarch-modal[hidden] { display: none; }
+
+#retroarch-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#retroarch-modal-dialog {
+  position: relative;
+  z-index: 1;
+  background: rgba(28, 28, 32, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+#retroarch-modal-dialog h2 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+#retroarch-curl-wrap {
+  position: relative;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 13px 14px;
+  margin-bottom: 14px;
+}
+
+#retroarch-curl-cmd {
+  display: block;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Mono', 'Cascadia Code', 'Consolas', monospace;
+  color: rgba(255, 255, 255, 0.88);
+  word-break: break-all;
+  user-select: all;
+  padding-right: 68px;
+}
+
+#retroarch-copied-badge {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #4ade80;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+#retroarch-copied-badge.visible { opacity: 1; }
+
+.ra-hint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.ra-hint kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#retroarch-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#retroarch-try-again-btn {
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  border-radius: 10px;
+  color: #111;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#retroarch-try-again-btn:hover { background: #fff; }
+
+#retroarch-copy-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#retroarch-copy-btn:hover { background: rgba(255, 255, 255, 0.14); }
+
+#retroarch-modal-actions a {
+  margin-left: auto;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+#retroarch-modal-actions a:hover { color: rgba(255, 255, 255, 0.6); }

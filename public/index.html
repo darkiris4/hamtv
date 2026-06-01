@@ -98,6 +98,24 @@
     <main id="grid" class="tile-grid"></main>
   </div>
 
+  <!-- RetroArch setup modal -->
+  <div id="retroarch-modal" role="dialog" aria-modal="true" aria-labelledby="retroarch-modal-title" hidden>
+    <div id="retroarch-modal-backdrop"></div>
+    <div id="retroarch-modal-dialog">
+      <h2 id="retroarch-modal-title">One-time setup required</h2>
+      <div id="retroarch-curl-wrap">
+        <code id="retroarch-curl-cmd"></code>
+        <span id="retroarch-copied-badge">Copied ✓</span>
+      </div>
+      <p class="ra-hint">Open Terminal &rarr; <kbd>⌘V</kbd> &rarr; <kbd>Return</kbd> &rarr; come back and click Try Again.</p>
+      <div id="retroarch-modal-actions">
+        <button id="retroarch-try-again-btn">Try Again</button>
+        <button id="retroarch-copy-btn">Copy again</button>
+        <a href="https://www.retroarch.com/index.php?page=platforms" target="_blank" rel="noopener noreferrer">Not Installed?</a>
+      </div>
+    </div>
+  </div>
+
   <script src="liquid-glass.js"></script>
   <script src="app.js"></script>
   <script src="js/trailer.js"></script>
